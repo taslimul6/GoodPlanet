@@ -8,6 +8,9 @@ export interface Event {
   location?: string;
   image?: string;
   capacity?: string | number;
+  hours?: string | number;
+  /** how many people joined – added by the API on list endpoints */
+  bookedCount?: number;
   status?: string;
   participants?: string[] | number;
   createdBy?: string;
