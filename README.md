@@ -106,7 +106,7 @@ GoodPlanet is built with the Next.js App Router. Every list, form and dashboard 
 | Auth | **Better Auth** (email, Google OAuth, JWT plugin) + `@better-auth/mongo-adapter` |
 | Data | **MongoDB**, Express API for business data ([server repo](https://github.com/taslimul6/GoodPlanet-server)) |
 | Images | **ImgBB** API (uploaded from the server, the key never reaches the browser) |
-| UX | `sonner` toasts, `next-themes`, `embla-carousel-react`, `recharts`, `date-fns` |
+| UX | `sonner` toasts, `next-themes`, `lucide-react` icons |
 
 ---
 
@@ -128,7 +128,7 @@ The client talks to the [GoodPlanet server](https://github.com/taslimul6/GoodPla
 | Area | Endpoints |
 | --- | --- |
 | Events | `GET /` · `GET /featured` · 🔒 `GET /event/:id` · 🔒 `POST /event` · 🔒 `PUT /event/:id` · 🔒 `DELETE /event/:id` · 🔒 `GET /myEvents` |
-| Joining | 🔒 `POST /event/join` · 🔒 `DELETE /event/join/:eventId` · 🔒 `GET /booked/:id` · 🔒 `GET /bookedEvents` |
+| Joining | 🔒 `POST /event/join` · 🔒 `DELETE /event/join/:eventId` · 🔒 `GET /bookedEvents` |
 | Capacity | 🔒 `GET /event/capacity/:id` · 🔒 `POST /event/waitlist` · 🔒 `DELETE /event/waitlist/:eventId` |
 | Saved | 🔒 `GET /saved` · 🔒 `GET /saved/ids` · 🔒 `POST /saved` · 🔒 `DELETE /saved/:eventId` |
 | Profile | 🔒 `GET /profile/stats` |
@@ -171,10 +171,17 @@ good-planet/
 │   │   └── lib/                  # auth.ts (server), auth-client.ts (browser)
 │   └── proxy.ts                  # Route protection
 ├── components/
-│   ├── events/                   # EventCard, SaveBtn, ShareBtn, JoinBtn, StatusBadge, …
-│   ├── profile/                  # Header and the Overview / Following / Settings tabs
-│   ├── homePage/ shared/ ui/     # Home sections, navbar and footer, shadcn/ui
-├── lib/                          # event types, date helpers, token helpers, server fetch
+│   ├── events/                   # EventCard, EventForm, SaveBtn, ShareBtn, JoinBtn, StatusBadge, dashboard, manage/
+│   ├── profile/                  # Header, Overview and Following tabs, SettingsTab + settings/ forms
+│   ├── auth/                     # Google sign-in button
+│   ├── homePage/ shared/         # Home sections, navbar and footer
+│   └── ui/                       # shadcn/ui components that are actually used
+├── lib/
+│   ├── apiClient.ts              # api(): fetch to the Express API with the user's JWT (browser)
+│   ├── apiServer.ts              # apiServer(): same for server components
+│   ├── serverEvents.ts           # loader shared by the dashboard pages
+│   ├── eventDate.ts, useToday.ts # date helpers
+│   └── event.ts, getToken*.ts, utils.ts
 ├── docs/                         # Feature plan, commit plan, screenshots
 └── public/
 ```
@@ -235,7 +242,8 @@ Google OAuth redirect URI: `{BETTER_AUTH_URL}/api/auth/callback/google`
 ## 🛡️ Security
 
 - All secrets come from environment variables and `.env*` files are gitignored.
-- Better Auth signs a short-lived JWT; the server verifies it against the client's JWKS. Newer endpoints read the user's email from the verified token, not from the request.
+- Better Auth signs a short-lived JWT; the server verifies it against the client's JWKS. The API reads the user's identity from the verified token only, never from the request body or headers.
+- Only the creator of an event can edit or delete it, and only whitelisted event fields can be written.
 - Photo uploads go through a server route that checks the session, the file type (JPG, PNG, WEBP, GIF) and the size (5 MB) before sending to ImgBB.
 - Deleting an account requires the password (or a fresh sign in for Google accounts) plus a typed confirmation, and removes the user's data.
 
@@ -249,7 +257,7 @@ Google OAuth redirect URI: `{BETTER_AUTH_URL}/api/auth/callback/google`
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run ESLint |
-| `npx tsc --noEmit` | Type check |
+| `npm run typecheck` | Type check (`tsc --noEmit`) |
 
 ---
 
