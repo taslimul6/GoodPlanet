@@ -18,6 +18,7 @@ import SaveBtn from "@/components/events/SaveBtn";
 import ShareBtn from "@/components/events/ShareBtn";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import Countdown from "@/components/events/Countdown";
+import FollowBtn from "@/components/events/FollowBtn";
 import { SpotsBadge, TimingBadge } from "@/components/events/StatusBadge";
 
 import { getTokenFromServer } from "@/lib/getTokenFromServer";
@@ -168,6 +169,11 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
 
                   <p className="mt-1 text-sm text-mut">Event organizer</p>
                 </div>
+
+                <FollowBtn
+                  organizer={event.organizer || undefined}
+                  ownerEmail={event.email}
+                />
               </Card>
             </section>
           </div>
