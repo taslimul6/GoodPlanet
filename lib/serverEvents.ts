@@ -1,8 +1,5 @@
-import { headers } from "next/headers";
-
 import { Event } from "@/lib/event";
-import { getTokenFromServer } from "@/lib/getTokenFromServer";
-import { auth } from "@/src/app/lib/auth";
+import { apiServer, isPrerenderAbort } from "@/lib/apiServer";
 
 /**
  * Server-side loader shared by the dashboard pages
@@ -13,19 +10,8 @@ export async function fetchUserEvents(
   path: "/myEvents" | "/bookedEvents"
 ): Promise<{ events: Event[]; failed: boolean }> {
   try {
-    // session + token are independent, so run them in parallel
-    const [session, token] = await Promise.all([
-      auth.api.getSession({ headers: await headers() }),
-      getTokenFromServer(),
-    ]);
-
-    const email = session?.user?.email;
-    if (!email) return { events: [], failed: true };
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}${path}`, {
-      cache: "no-store",
-      headers: { query: email, Authorization: `Bearer ${token}` },
-    });
+    // The server reads the user from the token, so the request needs nothing else.
+    const response = await apiServer(path);
 
     if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
@@ -34,6 +20,7 @@ export async function fetchUserEvents(
 
     return { events: Array.isArray(list) ? list : [], failed: false };
   } catch (error) {
+    if (isPrerenderAbort(error)) throw error;
     console.error(`Failed to fetch ${path}:`, error);
     return { events: [], failed: true };
   }

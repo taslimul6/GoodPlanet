@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-
+import { notFound } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,8 @@ import Countdown from "@/components/events/Countdown";
 import FollowBtn from "@/components/events/FollowBtn";
 import { SpotsBadge, TimingBadge } from "@/components/events/StatusBadge";
 
-import { getTokenFromServer } from "@/lib/getTokenFromServer";
+import { apiServer } from "@/lib/apiServer";
+import { Event } from "@/lib/event";
 
 /* ----------------------------- Loading skeleton ---------------------------- */
 
@@ -55,44 +56,16 @@ function EventDetailsSkeleton() {
 async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // jwt auth check
-  const token = await getTokenFromServer();
+  // The event and its seat count do not depend on each other, so load them together.
+  const [eventRes, capacityRes] = await Promise.all([
+    apiServer(`/event/${id}`),
+    apiServer(`/event/capacity/${id}`),
+  ]);
 
-  // Get data from the database based on the event ID
+  if (!eventRes.ok) notFound();
 
-  let response;
-  let event;
-  let eventCount: number = 0;
-
-  try {
-    response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/event/${id}`, {
-      cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      event = await response.json();
-    }
-
-    const eventRes = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/booked/${id}`, {
-       cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-
-    });
-
-    const bookedEvents = await eventRes.json();
-    eventCount = bookedEvents.length;
-    
-
-
-  } catch (error) {
-    console.error("Failed to fetch event:", error);
-  }
-
+  const event: Event = await eventRes.json();
+  const eventCount: number = capacityRes.ok ? (await capacityRes.json()).joined : 0;
 
   return (
     <main className="min-h-screen bg-bg text-fg">
