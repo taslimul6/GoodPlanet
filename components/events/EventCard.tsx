@@ -1,5 +1,6 @@
 import { Event } from "@/lib/event";
 import SaveBtn from "./SaveBtn";
+import { SpotsBadge, TimingBadge } from "./StatusBadge";
 
 export default function EventCard({
   event,
@@ -46,6 +47,11 @@ export default function EventCard({
           initialSaved={saved}
           onChange={onSavedChange}
         />
+
+        <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+          <TimingBadge date={event.date} />
+          <SpotsBadge capacity={event.capacity} booked={event.bookedCount} />
+        </div>
       </div>
 
       <div className="flex flex-col flex-1 p-5">

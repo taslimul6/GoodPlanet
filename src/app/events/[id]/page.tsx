@@ -17,6 +17,7 @@ import SaveBtn from "@/components/events/SaveBtn";
 import ShareBtn from "@/components/events/ShareBtn";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import Countdown from "@/components/events/Countdown";
+import { SpotsBadge, TimingBadge } from "@/components/events/StatusBadge";
 
 import { getTokenFromServer } from "@/lib/getTokenFromServer";
 
@@ -119,9 +120,8 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
                 {event.category}
               </Badge>
 
-              <Badge className="border-0 bg-white text-black hover:bg-white">
-                {event.status}
-              </Badge>
+              <TimingBadge date={event.date} />
+              <SpotsBadge capacity={event.capacity} booked={eventCount} />
             </div>
 
             <h1 className="max-w-3xl text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
