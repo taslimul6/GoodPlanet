@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Only logged-in users can access events routes
-  if (!user && pathname.startsWith("/events")) {
+  if (!user && (pathname.startsWith("/events") || pathname === "/profile")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -23,5 +23,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/signup", "/events/:path+"],
+  matcher: ["/login", "/signup", "/events/:path+", "/profile"],
 };
