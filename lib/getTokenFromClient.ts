@@ -1,8 +1,7 @@
 import { authClient } from "@/src/app/lib/auth-client";
 
+/** JWT for the logged-in user (browser side). Undefined when nobody is logged in. */
 export const getTokenFromClient = async () => {
-const {data, error} = await authClient.token();
-    const token = data?.token;
-
-    return token;
-}
+  const { data } = await authClient.token();
+  return data?.token;
+};
