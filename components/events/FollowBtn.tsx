@@ -4,17 +4,15 @@ import { useEffect, useState } from "react";
 import { UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
+import { api } from "@/lib/apiClient";
 import { authClient } from "@/src/app/lib/auth-client";
-
-const API = process.env.NEXT_PUBLIC_MAIN_API;
 
 export default function FollowBtn({
   organizer,
   ownerEmail,
 }: {
   organizer?: string;
-  /** email of the person who created the event – you cannot follow yourself */
+  /** Email of the person who created the event: you cannot follow yourself. */
   ownerEmail?: string;
 }) {
   const { data: session } = authClient.useSession();
@@ -30,11 +28,7 @@ export default function FollowBtn({
     let cancelled = false;
     (async () => {
       try {
-        const token = await getTokenFromClient();
-        const res = await fetch(
-          `${API}/follow/status/${encodeURIComponent(organizer)}`,
-          { headers: { Authorization: `Bearer ${token}`, query: email } }
-        );
+        const res = await api(`/follow/status/${encodeURIComponent(organizer)}`);
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled) {
@@ -66,22 +60,9 @@ export default function FollowBtn({
     const next = !following;
 
     try {
-      const token = await getTokenFromClient();
       const res = next
-        ? await fetch(`${API}/follow`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-              query: email,
-            },
-            body: JSON.stringify({ organizer, email }),
-          })
-        : await fetch(`${API}/follow/${encodeURIComponent(organizer)}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}`, query: email },
-          });
-
+        ? await api("/follow", { method: "POST", json: { organizer } })
+        : await api(`/follow/${encodeURIComponent(organizer)}`, { method: "DELETE" });
       if (!res.ok) throw new Error("request failed");
 
       const data = await res.json();
@@ -110,11 +91,7 @@ export default function FollowBtn({
               : "border-line hover:border-pri hover:bg-pri/10 hover:text-pri"
           }`}
         >
-          {following ? (
-            <UserCheck className="size-4" />
-          ) : (
-            <UserPlus className="size-4" />
-          )}
+          {following ? <UserCheck className="size-4" /> : <UserPlus className="size-4" />}
           {following ? "Following" : "Follow"}
         </button>
       )}

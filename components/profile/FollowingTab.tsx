@@ -6,19 +6,11 @@ import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
+import { api } from "@/lib/apiClient";
 
 import { FollowedOrganizer } from "./types";
 
-const API = process.env.NEXT_PUBLIC_MAIN_API;
-
-export default function FollowingTab({
-  email,
-  onCountChange,
-}: {
-  email: string;
-  onCountChange: (count: number) => void;
-}) {
+export default function FollowingTab({ onCountChange }: { onCountChange: (count: number) => void }) {
   const [list, setList] = useState<FollowedOrganizer[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -26,10 +18,7 @@ export default function FollowingTab({
   useEffect(() => {
     (async () => {
       try {
-        const token = await getTokenFromClient();
-        const res = await fetch(`${API}/following`, {
-          headers: { Authorization: `Bearer ${token}`, query: email },
-        });
+        const res = await api("/following");
         if (!res.ok) throw new Error("failed");
         setList(await res.json());
       } catch (err) {
@@ -37,17 +26,13 @@ export default function FollowingTab({
         setFailed(true);
       }
     })();
-  }, [email]);
+  }, []);
 
   const unfollow = async (organizer: string) => {
     if (busy) return;
     setBusy(organizer);
     try {
-      const token = await getTokenFromClient();
-      const res = await fetch(`${API}/follow/${encodeURIComponent(organizer)}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}`, query: email },
-      });
+      const res = await api(`/follow/${encodeURIComponent(organizer)}`, { method: "DELETE" });
       if (!res.ok) throw new Error("failed");
 
       const next = (list ?? []).filter((o) => o.organizer !== organizer);
