@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 
@@ -23,26 +24,36 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { authClient } from "@/src/app/lib/auth-client";
-import Link from "next/link";
 
+/** Links in the top bar. */
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Upcoming Events", href: "/events" },
   { name: "Stories", href: "/#stories" },
 ];
 
+/** Entries of the logged-in user's menu. */
+const userLinks = [
+  { name: "My profile", href: "/profile", icon: UserRound },
+  { name: "Create event", href: "/events/add", icon: CalendarPlus },
+  { name: "Manage events", href: "/events/manage", icon: CalendarDays },
+  { name: "Joined events", href: "/events/joined", icon: CalendarCheck },
+  { name: "Saved events", href: "/events/saved", icon: Bookmark },
+];
+
 export default function NavBar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // mobile menu
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // profile popover
   const router = useRouter();
 
   const { data: session } = authClient.useSession();
   const { theme, setTheme } = useTheme();
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   const handleSignOut = async () => {
+    setUserMenuOpen(false);
+    setMenuOpen(false);
     await authClient.signOut();
     router.push("/");
     router.refresh();
@@ -74,13 +85,9 @@ export default function NavBar() {
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-8 text-sm font-semibold text-mut md:flex">
           {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="transition hover:text-pri"
-            >
+            <Link key={link.name} href={link.href} className="transition hover:text-pri">
               {link.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -118,7 +125,7 @@ export default function NavBar() {
           </button>
 
           {session ? (
-            <Popover>
+            <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
               <PopoverTrigger
                 render={
                   <Button
@@ -149,45 +156,17 @@ export default function NavBar() {
                 <div className="my-2 h-px bg-line" />
 
                 <div className="grid gap-1">
-                  <a
-                    href="/profile"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
-                  >
-                    <UserRound className="size-4 text-mut" />
-                    My profile
-                  </a>
-
-                  <a
-                    href="/events/add"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
-                  >
-                    <CalendarPlus className="size-4 text-mut" />
-                    Create event
-                  </a>
-
-                  <a
-                    href="/events/manage"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
-                  >
-                    <CalendarDays className="size-4 text-mut" />
-                    Manage events
-                  </a>
-
-                  <a
-                    href="/events/joined"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
-                  >
-                    <CalendarCheck className="size-4 text-mut" />
-                    Joined events
-                  </a>
-
-                  <a
-                    href="/events/saved"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
-                  >
-                    <Bookmark className="size-4 text-mut" />
-                    Saved events
-                  </a>
+                  {userLinks.map(({ name, href, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
+                    >
+                      <Icon className="size-4 text-mut" />
+                      {name}
+                    </Link>
+                  ))}
                 </div>
 
                 <div className="my-2 h-px bg-line" />
@@ -202,12 +181,12 @@ export default function NavBar() {
               </PopoverContent>
             </Popover>
           ) : (
-            <a
+            <Link
               href="/login"
               className="hidden h-10 items-center rounded-full bg-pri px-5 text-sm font-bold text-on transition hover:opacity-90 sm:inline-flex"
             >
               Login
-            </a>
+            </Link>
           )}
 
           {/* Mobile Menu Button */}
@@ -235,24 +214,20 @@ export default function NavBar() {
       {menuOpen && (
         <div className="grid gap-1 border-t border-line bg-bg px-5 py-4 font-semibold md:hidden">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.name}
               href={link.href}
               className="py-3"
               onClick={() => setMenuOpen(false)}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
 
           {!session && (
-            <a
-              href="/login"
-              className="py-3 text-pri"
-              onClick={() => setMenuOpen(false)}
-            >
+            <Link href="/login" className="py-3 text-pri" onClick={() => setMenuOpen(false)}>
               Login
-            </a>
+            </Link>
           )}
 
           {session && (
