@@ -55,6 +55,7 @@ interface Event {
   location?: string;
   image?: string;
   capacity?: string | number;
+  hours?: string | number;
   status?: string;
   participants?: string[];
 
@@ -411,6 +412,22 @@ export  function PageContent() {
                       min="1"
                       defaultValue={event.capacity || ""}
                       placeholder="e.g. 100"
+                      className="h-12 rounded-xl border-line bg-bg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hours">
+                      Volunteer hours
+                    </Label>
+
+                    <Input
+                      id="hours"
+                      name="hours"
+                      type="number"
+                      min="1"
+                      max="24"
+                      defaultValue={event.hours || ""}
+                      placeholder="e.g. 4 (hours credited to each participant)"
                       className="h-12 rounded-xl border-line bg-bg"
                     />
                   </div>

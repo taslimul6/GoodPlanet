@@ -345,6 +345,21 @@ export default function AddEventPage() {
                       className="h-12 rounded-xl border-line bg-bg"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hours">
+                      Volunteer hours
+                    </Label>
+
+                    <Input
+                      id="hours"
+                      name="hours"
+                      type="number"
+                      min="1"
+                      max="24"
+                      placeholder="e.g. 4 (hours credited to each participant)"
+                      className="h-12 rounded-xl border-line bg-bg"
+                    />
+                  </div>
                 </div>
               </div>
 
