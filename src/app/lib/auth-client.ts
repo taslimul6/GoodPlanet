@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react"
-import { jwtClient } from "better-auth/client/plugins"
+import { inferAdditionalFields, jwtClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
   ...(process.env.NEXT_PUBLIC_BETTER_AUTH_URL && {
@@ -7,6 +7,9 @@ export const authClient = createAuthClient({
   }),
 
   plugins: [
-    jwtClient() 
+    jwtClient(),
+    inferAdditionalFields({
+      user: { bio: { type: "string", required: false } },
+    }),
   ]
 })

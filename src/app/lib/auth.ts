@@ -22,6 +22,40 @@ baseURL: process.env.BETTER_AUTH_URL,
         }, 
     },
 
+    user: {
+      // extra profile field shown on /profile
+      additionalFields: {
+        bio: { type: "string", required: false, input: true },
+      },
+      // lets users delete their own account from /profile
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (user) => {
+          const email = user.email;
+          const mine = await db
+            .collection("events")
+            .find({ email }, { projection: { _id: 1 } })
+            .toArray();
+          const myEventIds = mine.map((e) => String(e._id));
+
+          // remove everything that belongs to (or points at) this user
+          await Promise.all([
+            db.collection("events").deleteMany({ email }),
+            db.collection("bookedEvents").deleteMany({
+              $or: [{ email }, { eventId: { $in: myEventIds } }],
+            }),
+            db.collection("savedEvents").deleteMany({
+              $or: [{ email }, { eventId: { $in: myEventIds } }],
+            }),
+            db.collection("follows").deleteMany({ email }),
+            db.collection("waitlist").deleteMany({
+              $or: [{ email }, { eventId: { $in: myEventIds } }],
+            }),
+          ]);
+        },
+      },
+    },
+
     plugins: [
         jwt()
     ], 
