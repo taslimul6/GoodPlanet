@@ -17,8 +17,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/apiClient";
 import { Event } from "@/lib/event";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const linkClass =
   "inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-line text-sm font-medium transition hover:bg-pri/10";
@@ -33,14 +33,7 @@ const ManageActions = ({ event }: { event: Event }) => {
     setDeleting(true);
 
     try {
-      const token = await getTokenFromClient();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_MAIN_API}/event/${event._id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await api(`/event/${event._id}`, { method: "DELETE" });
 
       if (!response.ok) throw new Error("delete failed");
 

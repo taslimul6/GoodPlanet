@@ -7,7 +7,7 @@ import OverviewTab from "@/components/profile/OverviewTab";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import SettingsTab from "@/components/profile/SettingsTab";
 import { ProfileStats } from "@/components/profile/types";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
+import { api } from "@/lib/apiClient";
 import { authClient } from "@/src/app/lib/auth-client";
 
 const TABS = [
@@ -32,11 +32,7 @@ export default function ProfilePage() {
 
     (async () => {
       try {
-        const token = await getTokenFromClient();
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MAIN_API}/profile/stats`,
-          { headers: { Authorization: `Bearer ${token}`, query: email } }
-        );
+        const res = await api("/profile/stats");
         if (!res.ok) throw new Error("Failed to load stats");
         setStats(await res.json());
       } catch (err) {
@@ -97,10 +93,7 @@ export default function ProfilePage() {
 
           {tab === "following" && (
             <FollowingTab
-              email={email}
-              onCountChange={(count) =>
-                setStats((s) => (s ? { ...s, following: count } : s))
-              }
+              onCountChange={(count) => setStats((s) => (s ? { ...s, following: count } : s))}
             />
           )}
 
