@@ -20,7 +20,7 @@ export default function Quote() {
         </svg>
 
         <blockquote className="text-2xl sm:text-4xl font-bold leading-snug">
-          A better planet isn't built by a few heroes. It's built by millions
+          A better planet isn&apos;t built by a few heroes. It&apos;s built by millions
           of ordinary people doing one kind thing today.
         </blockquote>
 

@@ -1,15 +1,23 @@
 
 import FeaturedEventCard from "./FeaturedEventCard";
+import { isPrerenderAbort } from "@/lib/apiServer";
 import { Event } from "@/lib/event";
 
+/** Featured events for the home page. An unreachable API must not break the whole page. */
+async function loadFeatured(): Promise<Event[]> {
+  try {
+    const res = await fetch(process.env.FEATURED_API ?? "");
+    if (!res.ok) return [];
+    return (await res.json()) as Event[];
+  } catch (err) {
+    if (isPrerenderAbort(err)) throw err;
+    console.error("Could not load featured events:", err);
+    return [];
+  }
+}
+
 const Events = async () => {
-
- 
-  const api = process.env.FEATURED_API ?? "";
-  const res = await fetch(api);
-  const featuredData = (await res.json()) as Event[];
-
-
+  const featuredData = await loadFeatured();
 
   return (
     <section
@@ -30,16 +38,17 @@ const Events = async () => {
           </p>
         </div>
 
-        <div id="ev" className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          
-          {
-            featuredData.map((event) => <FeaturedEventCard key={event._id} event={event} />)
-
-          }
-         
-
-         
-        </div>
+        {featuredData.length > 0 ? (
+          <div id="ev" className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {featuredData.map((event) => (
+              <FeaturedEventCard key={event._id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-12 rounded-2xl border border-line bg-bg px-5 py-12 text-center text-mut">
+            New events are coming soon. Please check back shortly.
+          </p>
+        )}
       </div>
     </section>
   );
