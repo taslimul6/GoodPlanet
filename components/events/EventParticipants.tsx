@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Users } from "lucide-react";
 
 import { Event } from "@/lib/event";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
+import { api } from "@/lib/apiClient";
 import { authClient } from "@/src/app/lib/auth-client";
 
 import JoinBtn from "./JoinBtn";
@@ -36,11 +36,7 @@ const EventParticipants = ({
   const load = useCallback(async (): Promise<CapacityInfo | null> => {
     if (!email || !event._id) return null;
     try {
-      const token = await getTokenFromClient();
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_MAIN_API}/event/capacity/${event._id}`,
-        { headers: { Authorization: `Bearer ${token}`, query: email } }
-      );
+      const res = await api(`/event/capacity/${event._id}`);
       return res.ok ? await res.json() : null;
     } catch (err) {
       console.error(err);

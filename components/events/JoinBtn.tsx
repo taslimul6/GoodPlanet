@@ -16,12 +16,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/lib/event";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
-import { authClient } from "@/src/app/lib/auth-client";
+import { api } from "@/lib/apiClient";
 
 import type { CapacityInfo } from "./EventParticipants";
-
-const API = process.env.NEXT_PUBLIC_MAIN_API;
 
 const JoinBtn = ({
   event,
@@ -33,9 +30,6 @@ const JoinBtn = ({
   info: CapacityInfo | null;
   refresh: () => Promise<void>;
 }) => {
-  const { data: session } = authClient.useSession();
-  const email = session?.user?.email;
-
   const [busy, setBusy] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -51,21 +45,9 @@ const JoinBtn = ({
     }
   };
 
-  const authHeaders = async () => ({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${await getTokenFromClient()}`,
-    query: email ?? "",
-  });
-
   const handleJoin = () =>
     run(async () => {
-      const { _id, email: _owner, ...eventData } = event;
-
-      const res = await fetch(`${API}/event/join`, {
-        method: "POST",
-        headers: await authHeaders(),
-        body: JSON.stringify({ ...eventData, eventId: _id, email }),
-      });
+      const res = await api("/event/join", { method: "POST", json: { eventId: event._id } });
 
       if (res.ok) {
         toast.success("You have successfully joined this event!");
@@ -85,10 +67,7 @@ const JoinBtn = ({
     run(async () => {
       setConfirmOpen(false);
       try {
-        const res = await fetch(`${API}/event/join/${event._id}`, {
-          method: "DELETE",
-          headers: await authHeaders(),
-        });
+        const res = await api(`/event/join/${event._id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("cancel failed");
         toast.success("You have cancelled your participation.");
       } catch (err) {
@@ -100,11 +79,7 @@ const JoinBtn = ({
   const handleJoinWaitlist = () =>
     run(async () => {
       try {
-        const res = await fetch(`${API}/event/waitlist`, {
-          method: "POST",
-          headers: await authHeaders(),
-          body: JSON.stringify({ eventId: event._id }),
-        });
+        const res = await api("/event/waitlist", { method: "POST", json: { eventId: event._id } });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.message || "failed");
         toast.success(`You are #${data.position} on the waitlist.`);
@@ -121,10 +96,7 @@ const JoinBtn = ({
   const handleLeaveWaitlist = () =>
     run(async () => {
       try {
-        const res = await fetch(`${API}/event/waitlist/${event._id}`, {
-          method: "DELETE",
-          headers: await authHeaders(),
-        });
+        const res = await api(`/event/waitlist/${event._id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("failed");
         toast.success("You left the waitlist.");
       } catch (err) {
