@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Event, profile and cover images are remote URLs typed in by users, so their
+      // hosts are unknown and <Image> cannot be configured for them. Plain <img> is intended.
+      "@next/next/no-img-element": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
