@@ -1,21 +1,23 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "./app/lib/auth";
 
+/**
+ * Route protection (runs before the matched pages, see `config.matcher`).
+ * - logged-in users do not need /login or /signup, so they are sent home
+ * - guests cannot open /profile or anything below /events/ (details, add, edit, manage, joined, saved)
+ * The public list at /events is deliberately not matched, so guests can browse it.
+ */
 export async function proxy(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
+  const session = await auth.api.getSession({ headers: request.headers });
+  const isLoggedIn = Boolean(session?.user);
+  const { pathname } = request.nextUrl;
 
-  const user = session?.user;
-  const pathname = request.nextUrl.pathname;
-
-  // Logged-in user cannot access login or signup
-  if (user && (pathname === "/login" || pathname === "/signup")) {
+  if (isLoggedIn && (pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Only logged-in users can access events routes
-  if (!user && (pathname.startsWith("/events") || pathname === "/profile")) {
+  if (!isLoggedIn && (pathname.startsWith("/events/") || pathname === "/profile")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
