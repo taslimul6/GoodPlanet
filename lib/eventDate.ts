@@ -9,6 +9,10 @@ export function parseEventDate(date?: string | number): Date | null {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** Today in local time as YYYY-MM-DD (the format used by <input type="date"> and event.date). */
+export const todayISO = (now: Date = new Date()) =>
+  `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
 /** YYYYMMDD – used by Google Calendar and .ics all-day events */
 export function toCalendarDate(d: Date): string {
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
