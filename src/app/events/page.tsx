@@ -1,11 +1,13 @@
 "use client";
 
-import EventCard from "@/components/events/EventCard";
-import { Event } from "@/lib/event";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
 import { useEffect, useMemo, useState } from "react";
-import { authClient } from "@/src/app/lib/auth-client";
+import Link from "next/link";
 
+import EventCard from "@/components/events/EventCard";
+import { API_URL, api } from "@/lib/apiClient";
+import { Event } from "@/lib/event";
+import { getEventTiming } from "@/lib/eventDate";
+import { authClient } from "@/src/app/lib/auth-client";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -13,21 +15,17 @@ export default function EventsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [todayString, setTodayString] = useState("");
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const { data: session } = authClient.useSession();
   const email = session?.user?.email;
 
-  // Fetch the user's saved event ids once (instead of one request per card)
+  // The saved ids come in one request instead of one request per card.
   useEffect(() => {
     if (!email) return;
 
     (async () => {
       try {
-        const token = await getTokenFromClient();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/saved/ids`, {
-          headers: { Authorization: `Bearer ${token}`, query: email },
-        });
+        const res = await api("/saved/ids");
         if (res.ok) setSavedIds(new Set(await res.json()));
       } catch (err) {
         console.error(err);
@@ -35,34 +33,14 @@ export default function EventsPage() {
     })();
   }, [email]);
 
+  // The event list itself is public, so no token is needed.
   useEffect(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    setTodayString(
-      [
-        today.getFullYear(),
-        String(today.getMonth() + 1).padStart(2, "0"),
-        String(today.getDate()).padStart(2, "0"),
-      ].join("-")
-    );
-  }, []);
-
-  // Fetch events
-  useEffect(() => {
-    async function fetchEvents() {
+    (async () => {
       try {
-
-        const token = await getTokenFromClient(); // get token from client side
-        const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API ?? "", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const res = await fetch(`${API_URL}/`);
         if (!res.ok) throw new Error("Failed to fetch events");
 
         const data = await res.json();
-
         setEvents(Array.isArray(data) ? data : data.events || []);
       } catch (err) {
         console.error(err);
@@ -70,9 +48,7 @@ export default function EventsPage() {
       } finally {
         setLoading(false);
       }
-    }
-
-    fetchEvents();
+    })();
   }, []);
 
   // Categories
@@ -102,12 +78,13 @@ export default function EventsPage() {
           value?.toLowerCase().includes(searchText)
         );
 
-        const isUpcoming = event.date && event.date >= todayString;
+        // only events that have not finished yet
+        const isUpcoming = ["upcoming", "today"].includes(getEventTiming(event.date));
 
         return matchesCategory && matchesSearch && isUpcoming;
       })
       .sort((a, b) => String(a.date ?? "").localeCompare(String(b.date ?? "")));
-  }, [events, activeCategory, search, todayString]);
+  }, [events, activeCategory, search]);
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -128,13 +105,13 @@ export default function EventsPage() {
             </p>
           </div>
 
-          <a
+          <Link
             href="/events/add"
             className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-pri text-on font-bold hover:opacity-90 transition shrink-0"
           >
             <span className="text-xl leading-none">+</span>
             Add event
-          </a>
+          </Link>
         </div>
       </section>
 

@@ -6,30 +6,23 @@ import { ArrowRight, Bookmark } from "lucide-react";
 
 import EventCard from "@/components/events/EventCard";
 import { Event } from "@/lib/event";
-import { getTokenFromClient } from "@/lib/getTokenFromClient";
+import { api } from "@/lib/apiClient";
 import { authClient } from "@/src/app/lib/auth-client";
 
 export default function SavedEventsPage() {
   const { data: session, isPending } = authClient.useSession();
   const email = session?.user?.email;
 
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+  // null = still loading
+  const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (isPending) return;
-    if (!email) {
-      setLoading(false);
-      return;
-    }
+    if (!email) return;
 
     (async () => {
       try {
-        const token = await getTokenFromClient();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/saved`, {
-          headers: { Authorization: `Bearer ${token}`, query: email },
-        });
+        const res = await api("/saved");
         if (!res.ok) throw new Error("Failed to fetch saved events");
 
         const data = await res.json();
@@ -37,11 +30,12 @@ export default function SavedEventsPage() {
       } catch (err) {
         console.error(err);
         setError("Unable to load saved events. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     })();
-  }, [email, isPending]);
+  }, [email]);
+
+  const loading = isPending || (Boolean(email) && events === null && !error);
+  const list = events ?? [];
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -81,18 +75,16 @@ export default function SavedEventsPage() {
               <h3 className="text-xl font-extrabold">Something went wrong</h3>
               <p className="mt-2 text-mut">{error}</p>
             </div>
-          ) : events.length > 0 ? (
+          ) : list.length > 0 ? (
             <div className="grid gap-5 md:grid-cols-2">
-              {events.map((event) => (
+              {list.map((event) => (
                 <EventCard
                   key={event._id}
                   event={event}
                   saved
                   onSavedChange={(isSaved) => {
                     if (!isSaved) {
-                      setEvents((prev) =>
-                        prev.filter((e) => e._id !== event._id)
-                      );
+                      setEvents((prev) => (prev ?? []).filter((e) => e._id !== event._id));
                     }
                   }}
                 />
