@@ -150,6 +150,14 @@ export default function NavBar() {
 
                 <div className="grid gap-1">
                   <a
+                    href="/profile"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
+                  >
+                    <UserRound className="size-4 text-mut" />
+                    My profile
+                  </a>
+
+                  <a
                     href="/events/add"
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
                   >
