@@ -1,34 +1,27 @@
-'use client'
+"use client";
+
+import { FormEvent } from "react";
+import Link from "next/link";
+import { toast } from "sonner";
+
+import GoogleButton from "@/components/auth/GoogleButton";
 
 import { authClient } from "../lib/auth-client";
-import { FormEvent } from "react";
 
 export default function Login() {
+  const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
 
-  const handleSignIn = async (e: FormEvent<HTMLFormElement>)=>{
-  e.preventDefault();
-  const formData = new FormData(e.currentTarget);
-  const userData = Object.fromEntries(formData.entries());
+    // on success Better Auth redirects to callbackURL; on failure tell the user why
+    const { error } = await authClient.signIn.email({
+      email: String(form.get("email") ?? ""),
+      password: String(form.get("password") ?? ""),
+      callbackURL: "/",
+    });
 
-  const email = String(userData.email ?? "");
-  const password = String(userData.password ?? "");
-
-   const { data, error } = await authClient.signIn.email({
-        email,
-        password,
-        callbackURL: "/",
-
-})
-}
-
-
-const googleSignIn = async () => {
-  const data = await authClient.signIn.social({
-    provider: "google",
-  });
-};
-
-
+    if (error) toast.error(error.message || "Could not sign in. Check your email and password.");
+  };
 
   return (
     <main className="min-h-screen bg-bg text-fg flex items-center justify-center px-5 py-12">
@@ -118,60 +111,30 @@ const googleSignIn = async () => {
             </span>
           </div>
 
-          <button
-
-          onClick={googleSignIn}
-            type="button"
-            className="w-full h-12 rounded-full border border-line font-bold hover:bg-bg transition flex items-center justify-center gap-3"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                fill="#EA4335"
-                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
-              />
-              <path
-                fill="#4285F4"
-                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.91c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.39 38.06 46.98 31.91 46.98 24.55Z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M10.54 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.88.93 7.55 2.56 10.78l7.98-6.19Z"
-              />
-              <path
-                fill="#34A853"
-                d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.15 1.45-4.9 2.3-8.17 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
-              />
-            </svg>
-            Continue with Google
-          </button>
+          <GoogleButton />
 
           <p className="mt-8 text-center text-sm text-mut">
-            Don't have an account?{" "}
-            <a
+            Don&apos;t have an account?{" "}
+            <Link
               href="/signup"
               className="font-bold text-pri hover:underline"
             >
               Create account
-            </a>
+            </Link>
           </p>
         </div>
 
         <p className="mt-7 text-center text-xs text-mut">
-          By continuing, you agree to GoodPlanet's Terms of Service and
+          By continuing, you agree to GoodPlanet&apos;s Terms of Service and
           Privacy Policy.
         </p>
 
-        <a
+        <Link
           href="/"
           className="mt-6 flex justify-center text-sm font-semibold text-mut hover:text-pri transition"
         >
           ← Back to homepage
-        </a>
+        </Link>
       </div>
     </main>
   );
