@@ -27,7 +27,6 @@ export function Avatar({
     .join("");
 
   return image ? (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={image}
       alt={name ?? "Profile photo"}

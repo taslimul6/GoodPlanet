@@ -5,16 +5,11 @@ import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Event } from "@/lib/event";
-import { EventTiming, getEventTiming } from "@/lib/eventDate";
+import { getEventTiming } from "@/lib/eventDate";
+
+import { TimingBadge } from "./StatusBadge";
 
 /* Shared building blocks for the "Manage events" and "Joined events" pages. */
-
-const TIMING_BADGE: Record<EventTiming, { label: string; className: string }> = {
-  upcoming: { label: "Upcoming", className: "bg-pri text-on hover:bg-pri" },
-  today: { label: "Today", className: "bg-green-600 text-white hover:bg-green-600" },
-  ended: { label: "Ended", className: "bg-muted text-mut hover:bg-muted" },
-  unknown: { label: "", className: "" },
-};
 
 export function DashboardHeader({
   title,
@@ -93,12 +88,9 @@ export function DashboardEventCard({
   href: string;
   actions?: ReactNode;
 }) {
-  const timing = TIMING_BADGE[getEventTiming(event.date)];
-
   return (
     <Card className="group flex flex-col gap-0 overflow-hidden rounded-2xl border-line bg-card p-0 shadow-none transition hover:-translate-y-1 hover:shadow-lg hover:shadow-pri/5">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={event.image || "/placeholder-event.jpg"}
           alt={event.title ?? "Event"}
@@ -113,11 +105,7 @@ export function DashboardEventCard({
           </Badge>
         )}
 
-        {timing.label && (
-          <Badge className={`absolute right-3 top-3 border-0 ${timing.className}`}>
-            {timing.label}
-          </Badge>
-        )}
+        <TimingBadge date={event.date} className="absolute right-3 top-3" />
       </div>
 
       <div className="flex flex-1 flex-col p-5">
