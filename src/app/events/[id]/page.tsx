@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 
 import {
   CalendarDays,
+  Clock,
   MapPin,
   ArrowLeft,
   UserRound,
@@ -217,6 +218,19 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
 
                     <p className="mt-1 text-sm text-mut">
                       {event.organizer || "Community Organizer"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="mt-1 size-5 shrink-0 text-pri" />
+
+                  <div>
+                    <p className="text-sm font-semibold">Volunteer hours</p>
+
+                    <p className="mt-1 text-sm text-mut">
+                      {Number(event.hours) > 0 ? Number(event.hours) : 4} hours
+                      credited after the event
                     </p>
                   </div>
                 </div>
