@@ -44,7 +44,7 @@ const FeaturedEventCard = ({ event }: { event: Event }) => {
           {event.title}
         </h3>
 
-        <p className="mt-2 text-mut flex-1">
+        <p className="mt-2 text-mut flex-1 line-clamp-2">
           {event.description}
         </p>
 
