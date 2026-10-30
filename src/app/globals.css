@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+
+:root {
+  --bg: 247 250 247;
+  --fg: 15 31 23;
+  --card: 255 255 255;
+  --mut: 85 102 92;
+  --line: 218 228 221;
+  --pri: 22 128 62;
+  --on: 255 255 255;
+}
+
+.dark {
+  --bg: 9 19 14;
+  --fg: 236 244 238;
+  --card: 17 30 22;
+  --mut: 160 178 167;
+  --line: 34 54 42;
+  --pri: 74 222 128;
+  --on: 6 30 16;
+}
+
+@theme inline {
+  --color-bg: rgb(var(--bg));
+  --color-fg: rgb(var(--fg));
+  --color-card: rgb(var(--card));
+  --color-mut: rgb(var(--mut));
+  --color-line: rgb(var(--line));
+  --color-pri: rgb(var(--pri));
+  --color-on: rgb(var(--on));
+  --color-amb: #F59E0B;
+
+  --font-sans: var(--font-plus-jakarta-sans);
+}
+
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
+}
