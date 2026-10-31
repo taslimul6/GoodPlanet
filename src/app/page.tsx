@@ -6,20 +6,24 @@ import Mission from "@/components/homePage/Mission";
 import Newsletter from "@/components/homePage/NewsLetter";
 import Quote from "@/components/homePage/Quote";
 import Stories from "@/components/homePage/Stories";
-import Image from "next/image";
+
+import { Suspense } from "react";
 
 export default function Home() {
   return (
     <main>
-        <Hero />
-        <Mission />
-        <Initiative />
+      <Hero />
+      <Mission />
+      <Initiative />
+
+      <Suspense fallback={<p>Loading events...</p>}>
         <Events />
-        <Stories />
-        <Impact />
-        <Quote />
-        <Newsletter />
-     
+      </Suspense>
+    
+      <Stories />
+      <Impact />
+      <Quote />
+      <Newsletter />
     </main>
   );
 }
