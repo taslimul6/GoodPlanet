@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { authClient } from "../../lib/auth-client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
 const categories = [
   "Environment",
@@ -30,8 +27,64 @@ const categories = [
   "Other",
 ];
 
+const imageSuggestions = [
+  {
+    name: "Nature",
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+  },
+  {
+    name: "Feeding children",
+    url: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
+  },
+  {
+    name: "Plantation",
+    url: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b",
+  },
+];
+
 export default function AddEventPage() {
-  const [imageName, setImageName] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+
+  const today = new Date();
+  const minDate = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const {data:session } = authClient.useSession() 
+
+    
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    const eventData = {...data, createdBy: session?.user?.name , email: session?.user?.email};
+
+    console.log("Submitting event data:", eventData);
+
+    
+
+ 
+
+
+    const result = await fetch(process.env.NEXT_PUBLIC_MAIN_API + "/event", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
+    });
+
+
+    if(result.ok) {
+      toast.success("Event created successfully!");
+     
+      setCoverImage("");
+      redirect("/events");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -49,7 +102,9 @@ export default function AddEventPage() {
         </Button>
 
         <div className="mt-7">
-          <p className="text-sm font-bold text-pri">GoodPlanet community</p>
+          <p className="text-sm font-bold text-pri">
+            GoodPlanet community
+          </p>
 
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
             Create an event
@@ -66,11 +121,13 @@ export default function AddEventPage() {
       <section className="mx-auto max-w-5xl px-5 pb-16">
         <Card className="gap-0 rounded-3xl border-line bg-card py-0 shadow-none">
           <CardContent className="space-y-8 p-5 sm:p-8 lg:p-10">
-            <form className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Event Details */}
               <div>
                 <div className="mb-5">
-                  <h2 className="text-xl font-extrabold">Event details</h2>
+                  <h2 className="text-xl font-extrabold">
+                    Event details
+                  </h2>
                   <p className="mt-1 text-sm text-mut">
                     Start with the basic information about your event.
                   </p>
@@ -81,6 +138,7 @@ export default function AddEventPage() {
                     <Label htmlFor="eventTitle">
                       Event title <span className="text-pri">*</span>
                     </Label>
+
                     <Input
                       id="eventTitle"
                       name="title"
@@ -103,9 +161,13 @@ export default function AddEventPage() {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
 
-                      <SelectContent>
+                      <SelectContent className="z-[100] border border-line bg-card text-fg shadow-xl">
                         {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
+                          <SelectItem
+                            key={category}
+                            value={category}
+                            className="cursor-pointer focus:bg-pri/10 focus:text-pri"
+                          >
                             {category}
                           </SelectItem>
                         ))}
@@ -115,6 +177,7 @@ export default function AddEventPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="organizer">Organizer</Label>
+
                     <Input
                       id="organizer"
                       name="organizer"
@@ -127,6 +190,7 @@ export default function AddEventPage() {
                     <Label htmlFor="description">
                       Event description <span className="text-pri">*</span>
                     </Label>
+
                     <Textarea
                       id="description"
                       name="description"
@@ -144,7 +208,9 @@ export default function AddEventPage() {
               {/* Date and Location */}
               <div>
                 <div className="mb-5">
-                  <h2 className="text-xl font-extrabold">Date & location</h2>
+                  <h2 className="text-xl font-extrabold">
+                    Date & location
+                  </h2>
                   <p className="mt-1 text-sm text-mut">
                     Let people know when and where the event will happen.
                   </p>
@@ -155,40 +221,22 @@ export default function AddEventPage() {
                     <Label htmlFor="eventDate">
                       Event date <span className="text-pri">*</span>
                     </Label>
+
                     <Input
                       id="eventDate"
                       name="date"
                       type="date"
+                      min={minDate}
                       required
                       className="h-12 rounded-xl border-line bg-bg"
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="eventType">
-                      Event type <span className="text-pri">*</span>
-                    </Label>
-
-                    <Select name="eventType" defaultValue="In-person" required>
-                      <SelectTrigger
-                        id="eventType"
-                        className="h-12 w-full rounded-xl border-line bg-bg"
-                      >
-                        <SelectValue placeholder="Select event type" />
-                      </SelectTrigger>
-
-                      <SelectContent>
-                        <SelectItem value="In-person">In-person</SelectItem>
-                        <SelectItem value="Online">Online</SelectItem>
-                        <SelectItem value="Hybrid">Hybrid</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
 
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="location">
                       Venue / address <span className="text-pri">*</span>
                     </Label>
+
                     <Input
                       id="location"
                       name="location"
@@ -209,32 +257,62 @@ export default function AddEventPage() {
                     Cover image & capacity
                   </h2>
                   <p className="mt-1 text-sm text-mut">
-                    Add an image and set the number of participants.
+                    Add an image URL and set the number of participants.
                   </p>
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="coverImage">Event cover image</Label>
+                  <div className="space-y-3 sm:col-span-2">
+                    <Label htmlFor="coverImage">
+                      Event cover image URL
+                    </Label>
 
                     <Input
                       id="coverImage"
                       name="coverImage"
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      onChange={(event) =>
-                        setImageName(event.target.files?.[0]?.name || "")
-                      }
-                      className="h-12 rounded-xl border-line bg-bg file:mr-4 file:rounded-lg file:border-0 file:bg-pri/10 file:px-4 file:py-2 file:font-semibold file:text-pri"
+                      type="url"
+                      value={coverImage}
+                      onChange={(e) => setCoverImage(e.target.value)}
+                      placeholder="https://example.com/event-image.jpg"
+                      className="h-12 rounded-xl border-line bg-bg"
                     />
 
-                    {imageName && (
-                      <p className="text-xs text-mut">{imageName}</p>
+                    <div>
+                      <p className="mb-2 text-xs font-semibold text-mut">
+                        Image suggestions
+                      </p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {imageSuggestions.map((image) => (
+                          <Button
+                            key={image.name}
+                            type="button"
+                            variant="outline"
+                            onClick={() => setCoverImage(image.url)}
+                            className="h-9 rounded-full border-line px-4 text-xs hover:border-pri hover:text-pri"
+                          >
+                            {image.name}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {coverImage && (
+                      <div className="mt-3 overflow-hidden rounded-xl border border-line">
+                        <img
+                          src={coverImage}
+                          alt="Event cover preview"
+                          className="h-48 w-full object-cover"
+                        />
+                      </div>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="capacity">Participant capacity</Label>
+                    <Label htmlFor="capacity">
+                      Participant capacity
+                    </Label>
+
                     <Input
                       id="capacity"
                       name="capacity"
