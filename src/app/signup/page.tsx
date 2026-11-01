@@ -1,10 +1,41 @@
-export default function Signup() {
+"use client";
+
+
+
+import { useRouter } from "next/navigation";
+import { authClient } from "../lib/auth-client";
+
+const Signup = () => {
+ const router = useRouter();
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const userData = Object.fromEntries(formData.entries());
+
+    const { name, email, password } = userData;
+
+    const { data, error } = await authClient.signUp.email({
+      name,
+      email,
+      password,
+    });
+
+    if (data) {
+      router.push("/");
+    }
+  };
+
+const googleSignIn = async () => {
+  const data = await authClient.signIn.social({
+    provider: "google",
+  });
+};
+
   return (
     <main className="min-h-screen bg-bg text-fg flex items-center justify-center px-5 py-12">
       <div className="w-full max-w-md">
-        {/* Logo */}
-    
-        {/* Signup Card */}
         <div className="bg-card border border-line rounded-3xl p-7 sm:p-9 shadow-sm">
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -15,12 +46,13 @@ export default function Signup() {
             </p>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSignUp}>
             <div>
               <label className="block text-sm font-semibold mb-2">
                 Full name
               </label>
               <input
+                name="name"
                 type="text"
                 required
                 placeholder="Your full name"
@@ -33,6 +65,7 @@ export default function Signup() {
                 Email address
               </label>
               <input
+                name="email"
                 type="email"
                 required
                 placeholder="you@example.com"
@@ -45,6 +78,7 @@ export default function Signup() {
                 Password
               </label>
               <input
+                name="password"
                 type="password"
                 required
                 placeholder="Create a password"
@@ -91,15 +125,15 @@ export default function Signup() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-4 my-6">
             <div className="h-px flex-1 bg-line" />
             <span className="text-xs text-mut font-semibold">OR</span>
             <div className="h-px flex-1 bg-line" />
           </div>
 
-          {/* Google Signup */}
           <button
+
+          onClick={googleSignIn}
             type="button"
             className="w-full h-12 rounded-full border border-line bg-bg font-semibold flex items-center justify-center gap-3 hover:bg-line/30 transition"
           >
@@ -144,4 +178,6 @@ export default function Signup() {
       </div>
     </main>
   );
-}
+};
+
+export default Signup;

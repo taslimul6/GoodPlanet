@@ -1,5 +1,34 @@
+'use client'
+
+import { authClient } from "../lib/auth-client";
 
 export default function Login() {
+
+
+const handleSignIn = async (e)=>{
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+  const userData = Object.fromEntries(formData.entries());
+
+  const {email , password} = userData;
+
+   const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+
+})
+}
+
+
+const googleSignIn = async () => {
+  const data = await authClient.signIn.social({
+    provider: "google",
+  });
+};
+
+
+
   return (
     <main className="min-h-screen bg-bg text-fg flex items-center justify-center px-5 py-12">
       <div className="w-full max-w-md">
@@ -17,7 +46,7 @@ export default function Login() {
             </p>
           </div>
 
-          <form className="mt-8 space-y-5">
+          <form className="mt-8 space-y-5" onSubmit={handleSignIn}>
             <div>
               <label
                 htmlFor="email"
@@ -28,6 +57,7 @@ export default function Login() {
               <input
                 id="email"
                 type="email"
+                name='email'
                 required
                 placeholder="you@example.com"
                 className="w-full h-12 px-4 rounded-xl bg-bg border border-line outline-none focus:border-pri transition"
@@ -52,6 +82,7 @@ export default function Login() {
               </div>
 
               <input
+              name = 'password'
                 id="password"
                 type="password"
                 required
@@ -87,6 +118,8 @@ export default function Login() {
           </div>
 
           <button
+
+          onClick={googleSignIn}
             type="button"
             className="w-full h-12 rounded-full border border-line font-bold hover:bg-bg transition flex items-center justify-center gap-3"
           >
