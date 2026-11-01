@@ -43,7 +43,7 @@ const imageSuggestions = [
 ];
 
 export default function AddEventPage() {
-  const [coverImage, setCoverImage] = useState("");
+  const [image, setImage] = useState("");
 
   const today = new Date();
   const minDate = `${today.getFullYear()}-${String(
@@ -60,7 +60,7 @@ export default function AddEventPage() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    const eventData = {...data, createdBy: session?.user?.name , email: session?.user?.email};
+    const eventData = {...data, createdBy: session?.user?.name , email: session?.user?.email , participants: []};
 
     console.log("Submitting event data:", eventData);
 
@@ -81,7 +81,7 @@ export default function AddEventPage() {
     if(result.ok) {
       toast.success("Event created successfully!");
      
-      setCoverImage("");
+      setImage("");
       redirect("/events");
     }
   };
@@ -263,16 +263,16 @@ export default function AddEventPage() {
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-3 sm:col-span-2">
-                    <Label htmlFor="coverImage">
+                    <Label htmlFor="image">
                       Event cover image URL
                     </Label>
 
                     <Input
-                      id="coverImage"
-                      name="coverImage"
+                      id="image"
+                      name="image"
                       type="url"
-                      value={coverImage}
-                      onChange={(e) => setCoverImage(e.target.value)}
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
                       placeholder="https://example.com/event-image.jpg"
                       className="h-12 rounded-xl border-line bg-bg"
                     />
@@ -288,7 +288,7 @@ export default function AddEventPage() {
                             key={image.name}
                             type="button"
                             variant="outline"
-                            onClick={() => setCoverImage(image.url)}
+                            onClick={() => setImage(image.url)}
                             className="h-9 rounded-full border-line px-4 text-xs hover:border-pri hover:text-pri"
                           >
                             {image.name}
@@ -297,10 +297,10 @@ export default function AddEventPage() {
                       </div>
                     </div>
 
-                    {coverImage && (
+                    {image && (
                       <div className="mt-3 overflow-hidden rounded-xl border border-line">
                         <img
-                          src={coverImage}
+                          src={image}
                           alt="Event cover preview"
                           className="h-48 w-full object-cover"
                         />

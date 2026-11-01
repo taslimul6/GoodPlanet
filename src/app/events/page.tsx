@@ -1,7 +1,8 @@
-
 "use client";
 
+import EventCard from "@/components/events/EventCard";
 import { useEffect, useMemo, useState } from "react";
+
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -10,15 +11,13 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch all events from API
+  // Fetch events
   useEffect(() => {
-    const fetchEvents = async () => {
+    async function fetchEvents() {
       try {
         const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API);
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch events");
-        }
+        if (!res.ok) throw new Error("Failed to fetch events");
 
         const data = await res.json();
 
@@ -29,56 +28,57 @@ export default function EventsPage() {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchEvents();
   }, []);
 
-  // Dynamic categories
-  const categories = useMemo(() => {
-    const uniqueCategories = [
+  // Categories
+  const categories = useMemo(
+    () => [
+      "All events",
       ...new Set(events.map((event) => event.category).filter(Boolean)),
-    ];
+    ],
+    [events]
+  );
 
-    return ["All events", ...uniqueCategories];
-  }, [events]);
-
-  // Search and category filter
+  // Filter and sort events
   const filteredEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todayString = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0"),
+    ].join("-");
+
     const searchText = search.toLowerCase().trim();
 
-    return events.filter((event) => {
-      const matchesCategory =
-        activeCategory === "All events" ||
-        event.category === activeCategory;
+    return events
+      .filter((event) => {
+        const matchesCategory =
+          activeCategory === "All events" ||
+          event.category === activeCategory;
 
-      const matchesSearch =
-        event.title?.toLowerCase().includes(searchText) ||
-        event.location?.toLowerCase().includes(searchText) ||
-        event.category?.toLowerCase().includes(searchText);
+        const matchesSearch = [
+          event.title,
+          event.location,
+          event.category,
+        ].some((value) =>
+          value?.toLowerCase().includes(searchText)
+        );
 
-      return matchesCategory && matchesSearch;
-    });
+        const isUpcoming = event.date && event.date >= todayString;
+
+        return matchesCategory && matchesSearch && isUpcoming;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
   }, [events, activeCategory, search]);
-
-  // Format event date
-  const formatDate = (date) => {
-    if (!date) return "Date not specified";
-
-    const eventDate = new Date(date);
-
-    if (Number.isNaN(eventDate.getTime())) return "Date not specified";
-
-    return eventDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   return (
     <main className="min-h-screen bg-bg text-fg">
-
-      {/* Page Header */}
+      {/* Header */}
       <section className="max-w-7xl mx-auto px-5 pt-12 pb-8 lg:pt-16">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
           <div>
@@ -105,11 +105,10 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <section className="max-w-7xl mx-auto px-5">
         <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
             {/* Categories */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
               {categories.map((category) => (
@@ -178,7 +177,6 @@ export default function EventsPage() {
             ))}
           </div>
         ) : error ? (
-          /* Error */
           <div className="rounded-2xl border border-line bg-card py-16 px-5 text-center">
             <h3 className="text-xl font-extrabold">
               Something went wrong
@@ -194,55 +192,9 @@ export default function EventsPage() {
             </button>
           </div>
         ) : filteredEvents.length > 0 ? (
-          /* Events */
           <div className="grid md:grid-cols-2 gap-5">
             {filteredEvents.map((event) => (
-              <article
-                key={event._id}
-                className="group flex flex-col sm:flex-row bg-card border border-line rounded-2xl overflow-hidden hover:border-pri/50 hover:shadow-lg hover:shadow-pri/5 transition"
-              >
-                <div className="im relative h-52 sm:h-auto sm:w-44 md:w-48 shrink-0 overflow-hidden">
-                  <img
-                    src={event.image || "/placeholder-event.jpg"}
-                    alt={event.title}
-                    className="w-full h-full object-cover"
-                  />
-
-                  {event.category && (
-                    <span className="absolute top-3 left-3 bg-card/95 text-fg text-xs font-bold px-3 py-1.5 rounded-full">
-                      {event.category}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-col flex-1 p-5">
-                  <div className="flex items-center gap-2 text-sm text-pri font-bold">
-                    <span>{formatDate(event.date)}</span>
-
-                    <span className="size-1 rounded-full bg-pri" />
-
-                    <span className="text-mut font-medium">
-                      {event.location}
-                    </span>
-                  </div>
-
-                  <h3 className="mt-2 text-xl font-extrabold tracking-tight">
-                    {event.title}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-mut leading-relaxed">
-                    {event.description}
-                  </p>
-
-                  <a
-                    href={`/events/${event._id}`}
-                    className="inline-flex items-center gap-2 mt-4 text-pri text-sm font-bold hover:gap-3 transition-all"
-                  >
-                    View event
-                    <span aria-hidden="true">→</span>
-                  </a>
-                </div>
-              </article>
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         ) : (
