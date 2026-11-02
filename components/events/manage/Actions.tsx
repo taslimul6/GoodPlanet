@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -33,6 +33,13 @@ const ManageActions = ({ event }: { event: Event }) => {
 
   return (
     <div className="mt-auto flex gap-2 pt-6">
+      <Link
+        href={`/events/${event._id}`}
+        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-line text-sm font-medium transition hover:bg-pri/10"
+      >
+        <ArrowRight className="size-4" />
+        View
+      </Link>
       <Link
         href={`/events/edit/${event._id}`}
         className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-line text-sm font-medium transition hover:bg-pri/10"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "../../lib/auth-client";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { redirect } from "next/navigation";
 
 const categories = [
   "Environment",
@@ -45,6 +45,7 @@ const imageSuggestions = [
 export default function AddEventPage() {
   const [image, setImage] = useState("");
   const [minDate, setMinDate] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const today = new Date();
@@ -85,9 +86,10 @@ export default function AddEventPage() {
 
     if(result.ok) {
       toast.success("Event created successfully!");
-     
       setImage("");
-      redirect("/events");
+      setTimeout(() => {
+        router.push("/events/manage");
+      }, 1200);
     }
   };
 
