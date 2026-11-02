@@ -206,13 +206,6 @@ export async function MyEventsPageContent() {
                       <MapPin className="size-4 shrink-0 text-pri" />
                       <span>{event.location}</span>
                     </div>
-
-                    <div className="flex items-center gap-2 text-sm text-mut">
-                      <Users className="size-4 shrink-0 text-pri" />
-                      <span>
-                        {event.participants} / {event.capacity} participants
-                      </span>
-                    </div>
                   </div>
 
                   {/* Actions */}
