@@ -1,8 +1,10 @@
-export default function EventCard({ event }) {
-  const formatDate = (date) => {
+import { Event } from "@/lib/event";
+
+export default function EventCard({ event }: { event: Event }) {
+  const formatDate = (date: string | number | undefined) => {
     if (!date) return "Date not specified";
 
-    const [year, month, day] = date.split("-").map(Number);
+    const [year, month, day] = String(date).split("-").map(Number);
     const eventDate = new Date(year, month - 1, day);
 
     if (Number.isNaN(eventDate.getTime())) {

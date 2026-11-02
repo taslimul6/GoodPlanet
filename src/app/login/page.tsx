@@ -1,16 +1,17 @@
 'use client'
 
 import { authClient } from "../lib/auth-client";
+import { FormEvent } from "react";
 
 export default function Login() {
 
-
-const handleSignIn = async (e)=>{
+  const handleSignIn = async (e: FormEvent<HTMLFormElement>)=>{
   e.preventDefault();
   const formData = new FormData(e.currentTarget);
   const userData = Object.fromEntries(formData.entries());
 
-  const {email , password} = userData;
+  const email = String(userData.email ?? "");
+  const password = String(userData.password ?? "");
 
    const { data, error } = await authClient.signIn.email({
         email,

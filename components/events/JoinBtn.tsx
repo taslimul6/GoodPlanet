@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Users, CheckCircle2 } from "lucide-react";
 import { authClient } from "@/src/app/lib/auth-client";
+import { Event } from "@/lib/event";
 
-const JoinBtn = ({ event }) => {
+const JoinBtn = ({ event }: { event: Event }) => {
 
   console.log("event in JoinBtn:", event._id);
 

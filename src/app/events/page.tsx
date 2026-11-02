@@ -1,21 +1,35 @@
 "use client";
 
 import EventCard from "@/components/events/EventCard";
+import { Event } from "@/lib/event";
 import { useEffect, useMemo, useState } from "react";
 
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [activeCategory, setActiveCategory] = useState("All events");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [todayString, setTodayString] = useState("");
+
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    setTodayString(
+      [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0"),
+      ].join("-")
+    );
+  }, []);
 
   // Fetch events
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API);
+        const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API ?? "");
 
         if (!res.ok) throw new Error("Failed to fetch events");
 
@@ -37,22 +51,13 @@ export default function EventsPage() {
   const categories = useMemo(
     () => [
       "All events",
-      ...new Set(events.map((event) => event.category).filter(Boolean)),
+      ...new Set(events.map((event) => event.category ?? "").filter(Boolean)),
     ],
     [events]
   );
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const todayString = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, "0"),
-      String(today.getDate()).padStart(2, "0"),
-    ].join("-");
-
     const searchText = search.toLowerCase().trim();
 
     return events
@@ -73,8 +78,8 @@ export default function EventsPage() {
 
         return matchesCategory && matchesSearch && isUpcoming;
       })
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }, [events, activeCategory, search]);
+      .sort((a, b) => String(a.date ?? "").localeCompare(String(b.date ?? "")));
+  }, [events, activeCategory, search, todayString]);
 
   return (
     <main className="min-h-screen bg-bg text-fg">

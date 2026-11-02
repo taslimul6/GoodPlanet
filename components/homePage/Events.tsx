@@ -1,10 +1,10 @@
 import FeaturedEventCard from "./FeaturedEventCard";
+import { Event } from "@/lib/event";
 
-
-const Events = async()=> {
-
-   const res = await fetch(process.env.FEATURED_API);
-   const featuredData = await res.json();
+const Events = async () => {
+  const api = process.env.FEATURED_API ?? "";
+  const res = await fetch(api);
+  const featuredData = (await res.json()) as Event[];
 
 
 

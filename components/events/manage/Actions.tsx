@@ -5,8 +5,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Event } from "@/lib/event";
 
-const ManageActions = ({ event }) => {
+const ManageActions = ({ event }: { event: Event }) => {
   const router = useRouter();
 
   const handleEventDelete = async () => {

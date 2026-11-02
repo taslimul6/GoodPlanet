@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { headers } from "next/headers";
+import { Event } from "@/lib/event";
 
 import {
   CalendarDays,
@@ -40,19 +41,23 @@ export async function MyEventsPageContent() {
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/myEvents`,
-    { method: "GET", cache: "no-store", headers: { query: session?.user?.email } }
+    {
+      method: "GET",
+      cache: "no-store",
+      headers: { query: session?.user?.email ?? "" },
+    }
   );
 
-  const myEvents = await response.json();
+  const myEvents: Event[] = await response.json();
 
   const sortedEvents = myEvents
     .slice()
-    .sort((a: any, b: any) => {
+    .sort((a: Event, b: Event) => {
       const aUpcoming = a.status === "Upcoming";
       const bUpcoming = b.status === "Upcoming";
       if (aUpcoming && !bUpcoming) return -1;
       if (!aUpcoming && bUpcoming) return 1;
-      return a.date.localeCompare(b.date);
+      return String(a.date ?? "").localeCompare(String(b.date ?? ""));
     });
 
 
@@ -63,7 +68,8 @@ export async function MyEventsPageContent() {
   //end api call
 
   const totalParticipants = myEvents.reduce(
-    (total, event) => total + event.participants,
+    (total, event) =>
+      total + (typeof event.participants === "number" ? event.participants : 0),
     0
   );
 

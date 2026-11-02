@@ -165,7 +165,6 @@ export  function PageContent() {
       {/* Header */}
       <section className="mx-auto max-w-5xl px-5 pt-12 pb-8 lg:pt-16">
         <Button
-          asChild
           variant="ghost"
           className="h-auto px-0 text-mut hover:bg-transparent hover:text-pri"
         >
@@ -414,7 +413,6 @@ export  function PageContent() {
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
-                    asChild
                     type="button"
                     variant="outline"
                     className="h-12 rounded-full border-line px-6"

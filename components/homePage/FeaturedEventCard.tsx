@@ -1,6 +1,7 @@
+import { Event } from "@/lib/event";
 
-const FeaturedEventCard = ({ event }) => {
-  const eventDate = new Date(event.date);
+const FeaturedEventCard = ({ event }: { event: Event }) => {
+  const eventDate = new Date(event.date ?? "");
 
   const day = eventDate.getDate();
   const month = eventDate.toLocaleString("en-US", {

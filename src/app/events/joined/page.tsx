@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Event } from "@/lib/event";
 
 import {
   CalendarDays,
@@ -39,7 +40,7 @@ async function JoinedEventsContent() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        query: session?.user?.email,
+        query: session?.user?.email ?? "",
       },
     }
   );
@@ -47,7 +48,7 @@ async function JoinedEventsContent() {
   const data = await response.json();
   console.log("response:", data);
 
-  const joinedEvents =  data || [];
+  const joinedEvents: Event[] = data || [];
 
   const upcomingEvents = joinedEvents.filter(
     (event) => event.status === "Upcoming"
@@ -209,7 +210,7 @@ async function JoinedEventsContent() {
                   {/* Action */}
                   <div className="mt-auto pt-6">
                     <Link
-                      href={`/events/${event.id}`}
+                      href={`/events/${event._id}`}
                       className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-line text-sm font-semibold transition hover:border-pri hover:bg-pri/10 hover:text-pri"
                     >
                       View event details
@@ -238,7 +239,6 @@ async function JoinedEventsContent() {
           </p>
 
           <Button
-            asChild={false}
             className="mt-5 rounded-full bg-pri px-6 text-on hover:opacity-90"
           >
             <Link href="/events">Explore events</Link>

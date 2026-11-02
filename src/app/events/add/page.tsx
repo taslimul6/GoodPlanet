@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { authClient } from "../../lib/auth-client";
 
 import { Button } from "@/components/ui/button";
@@ -44,17 +44,22 @@ const imageSuggestions = [
 
 export default function AddEventPage() {
   const [image, setImage] = useState("");
+  const [minDate, setMinDate] = useState("");
 
-  const today = new Date();
-  const minDate = `${today.getFullYear()}-${String(
-    today.getMonth() + 1
-  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  useEffect(() => {
+    const today = new Date();
+    setMinDate(
+      `${today.getFullYear()}-${String(
+        today.getMonth() + 1
+      ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    );
+  }, []);
 
   const {data:session } = authClient.useSession() 
 
     
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -91,7 +96,6 @@ export default function AddEventPage() {
       {/* Header */}
       <section className="mx-auto max-w-5xl px-5 pt-12 pb-8 lg:pt-16">
         <Button
-          asChild
           variant="ghost"
           className="h-auto px-0 text-mut hover:bg-transparent hover:text-pri"
         >
@@ -334,7 +338,6 @@ export default function AddEventPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
-                    asChild
                     type="button"
                     variant="outline"
                     className="h-12 rounded-full border-line px-6"
