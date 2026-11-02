@@ -147,7 +147,7 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
           <aside>
             <Card className="sticky top-8 gap-0 rounded-2xl border-line bg-card p-6 shadow-none">
               {/* Join Button Component */}
-              <JoinBtn eventId={id} />
+              <JoinBtn event={event} />
 
               {/* Divider */}
               <div className="my-6 border-t border-line" />

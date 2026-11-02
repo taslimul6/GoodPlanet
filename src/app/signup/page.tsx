@@ -3,18 +3,38 @@
 
 
 import { useRouter } from "next/navigation";
+import { useState, FormEvent } from "react";
 import { authClient } from "../lib/auth-client";
+
+const hasUpper = (pw: string) => /[A-Z]/.test(pw);
+const hasLower = (pw: string) => /[a-z]/.test(pw);
+const hasNumber = (pw: string) => /\d/.test(pw);
+const hasSpecial = (pw: string) => /[^a-zA-Z0-9]/.test(pw);
+
+const isPasswordValid = (pw: string) =>
+  pw.length >= 8 && hasNumber(pw) && hasUpper(pw) && hasSpecial(pw);
+
+const requirementMet = (pw: string, check: (s: string) => boolean) =>
+  check(pw);
 
 const Signup = () => {
  const router = useRouter();
 
-  const handleSignUp = async (e) => {
+  const [passwordValue, setPasswordValue] = useState("");
+
+  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isPasswordValid(passwordValue)) {
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const userData = Object.fromEntries(formData.entries());
 
-    const { name, email, password } = userData;
+    const name = String(userData.name ?? "");
+    const email = String(userData.email ?? "");
+    const password = String(userData.password ?? "");
 
     const { data, error } = await authClient.signUp.email({
       name,
@@ -83,7 +103,40 @@ const googleSignIn = async () => {
                 required
                 placeholder="Create a password"
                 className="w-full h-12 px-4 rounded-xl bg-bg border border-line outline-none focus:border-pri transition"
+                onChange={(e) => setPasswordValue(e.target.value)}
               />
+              <div className="mt-2 text-xs space-y-1">
+                <div className={`flex items-center gap-2 ${requirementMet(passwordValue, (s) => s.length >= 8) ? "text-pri" : "text-mut"}`}>
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] border">
+                    {passwordValue.length >= 8 ? "✓" : "✗"}
+                  </span>
+                  <span>Minimum 8 characters</span>
+                </div>
+                <div className={`flex items-center gap-2 ${requirementMet(passwordValue, hasUpper) ? "text-pri" : "text-mut"}`}>
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] border">
+                    {requirementMet(passwordValue, hasUpper) ? "✓" : "✗"}
+                  </span>
+                  <span>1 uppercase letter</span>
+                </div>
+                <div className={`flex items-center gap-2 ${requirementMet(passwordValue, hasLower) ? "text-pri" : "text-mut"}`}>
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] border">
+                    {requirementMet(passwordValue, hasLower) ? "✓" : "✗"}
+                  </span>
+                  <span>1 lowercase letter</span>
+                </div>
+                <div className={`flex items-center gap-2 ${requirementMet(passwordValue, hasNumber) ? "text-pri" : "text-mut"}`}>
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] border">
+                    {requirementMet(passwordValue, hasNumber) ? "✓" : "✗"}
+                  </span>
+                  <span>1 number</span>
+                </div>
+                <div className={`flex items-center gap-2 ${requirementMet(passwordValue, hasSpecial) ? "text-pri" : "text-mut"}`}>
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] border">
+                    {requirementMet(passwordValue, hasSpecial) ? "✓" : "✗"}
+                  </span>
+                  <span>1 special character</span>
+                </div>
+              </div>
             </div>
 
             <div>

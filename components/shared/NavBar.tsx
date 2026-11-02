@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+
 import {
   CalendarPlus,
   CalendarDays,
@@ -28,15 +30,14 @@ const navLinks = [
 ];
 
 export default function NavBar() {
-  const [isDark, setIsDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
   const { data: session } = authClient.useSession();
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle("dark");
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const handleSignOut = async () => {
@@ -88,7 +89,7 @@ export default function NavBar() {
             className="grid size-10 place-items-center rounded-full transition hover:bg-line"
             aria-label="Toggle dark mode"
           >
-            {isDark ? (
+            {theme === "dark" ? (
               <svg
                 width="20"
                 height="20"

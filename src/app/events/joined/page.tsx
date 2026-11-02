@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,66 +14,41 @@ import {
   Clock,
 } from "lucide-react";
 
-const joinedEvents = [
-  {
-    id: 1,
-    title: "Community Tree Planting Day",
-    category: "Environment",
-    date: "November 14, 2026",
-    location: "Dhaka, Bangladesh",
-    participants: 42,
-    capacity: 100,
-    status: "Upcoming",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "Join the community to plant native trees and create a greener neighborhood.",
-  },
-  {
-    id: 2,
-    title: "Beach Cleanup Campaign",
-    category: "Environment",
-    date: "November 18, 2026",
-    location: "Cox's Bazar, Bangladesh",
-    participants: 65,
-    capacity: 120,
-    status: "Upcoming",
-    image:
-      "https://images.unsplash.com/photo-1618477461853-cf6ed80faba9?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "Help clean our beautiful beaches and protect marine life from plastic pollution.",
-  },
-  {
-    id: 3,
-    title: "Winter Clothes Donation",
-    category: "Community",
-    date: "November 21, 2026",
-    location: "Mirpur, Dhaka",
-    participants: 85,
-    capacity: 150,
-    status: "Upcoming",
-    image:
-      "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "Help collect and distribute warm clothes to families in need this winter.",
-  },
-  {
-    id: 4,
-    title: "Neighborhood Clean-up",
-    category: "Community",
-    date: "October 18, 2026",
-    location: "Dhanmondi, Dhaka",
-    participants: 30,
-    capacity: 50,
-    status: "Completed",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "A community clean-up initiative to make our streets cleaner and safer.",
-  },
-];
+import { auth } from "../../lib/auth";
+import { headers } from "next/headers";
 
 export default function JoinedEventsPage() {
+  return (
+    <Suspense fallback={<JoinedEventsLoading />}>
+      <JoinedEventsContent />
+    </Suspense>
+  );
+}
+
+async function JoinedEventsContent() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  console.log(session?.user?.email);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_MAIN_API}/bookedEvents`,
+    {
+      cache: "no-store",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        query: session?.user?.email,
+      },
+    }
+  );
+
+  const data = await response.json();
+  console.log("response:", data);
+
+  const joinedEvents =  data || [];
+
   const upcomingEvents = joinedEvents.filter(
     (event) => event.status === "Upcoming"
   ).length;
@@ -174,7 +150,7 @@ export default function JoinedEventsPage() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {joinedEvents.map((event) => (
               <Card
-                key={event.id}
+                key={event._id}
                 className="group flex flex-col gap-0 overflow-hidden rounded-2xl border-line bg-card p-0 shadow-none transition hover:-translate-y-1 hover:shadow-lg hover:shadow-pri/5"
               >
                 {/* Image */}
@@ -269,6 +245,18 @@ export default function JoinedEventsPage() {
           </Button>
         </div>
 
+      </div>
+    </main>
+  );
+}
+
+function JoinedEventsLoading() {
+  return (
+    <main className="min-h-screen bg-bg text-fg">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <p className="text-sm text-mut">
+          Loading joined events...
+        </p>
       </div>
     </main>
   );

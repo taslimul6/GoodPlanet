@@ -1,64 +1,67 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { headers } from "next/headers";
 
 import {
   CalendarDays,
   MapPin,
   Users,
   Plus,
-  Pencil,
-  Trash2,
-} from "lucide-react";
 
-const myEvents = [
-  {
-    id: 1,
-    title: "Community Tree Planting Day",
-    category: "Environment",
-    date: "November 14, 2026",
-    location: "Dhaka, Bangladesh",
-    participants: 42,
-    capacity: 100,
-    status: "Upcoming",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "Join our community to plant native trees and create a greener neighborhood.",
-  },
-  {
-    id: 2,
-    title: "Winter Clothes Donation",
-    category: "Community",
-    date: "November 21, 2026",
-    location: "Mirpur, Dhaka",
-    participants: 85,
-    capacity: 150,
-    status: "Upcoming",
-    image:
-      "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "Collect and distribute warm clothes to families in need this winter.",
-  },
-  {
-    id: 3,
-    title: "Neighborhood Clean-up",
-    category: "Environment",
-    date: "October 18, 2026",
-    location: "Dhanmondi, Dhaka",
-    participants: 30,
-    capacity: 50,
-    status: "Completed",
-    image:
-      "https://images.unsplash.com/photo-1618477461853-cf6ed80faba9?auto=format&fit=crop&w=900&h=600&q=85",
-    description:
-      "A community clean-up initiative to make our streets cleaner and safer.",
-  },
-];
+} from "lucide-react";
+import { auth } from "../../lib/auth";
+import { Suspense } from "react";
+import ManageActions from "@/components/events/manage/Actions";
+
+
+
+
+
 
 export default function MyEventsPage() {
+  return (
+    <Suspense fallback={<>Loading...</>}>
+      <MyEventsPageContent />
+    </Suspense>
+  );
+}
+
+export async function MyEventsPageContent() {
+
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  console.log(session?.user?.email);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_MAIN_API}/myEvents`,
+    { method: "GET", cache: "no-store", headers: { query: session?.user?.email } }
+  );
+
+  const myEvents = await response.json();
+
+  const sortedEvents = myEvents
+    .slice()
+    .sort((a: any, b: any) => {
+      const aUpcoming = a.status === "Upcoming";
+      const bUpcoming = b.status === "Upcoming";
+      if (aUpcoming && !bUpcoming) return -1;
+      if (!aUpcoming && bUpcoming) return 1;
+      return a.date.localeCompare(b.date);
+    });
+
+
+
+  
+  
+  
+  //end api call
+
   const totalParticipants = myEvents.reduce(
     (total, event) => total + event.participants,
     0
@@ -122,7 +125,8 @@ export default function MyEventsPage() {
               Total participants
             </p>
             <p className="mt-2 text-3xl font-extrabold">
-              {totalParticipants}
+              {/* {totalParticipants} */}
+              122
             </p>
           </Card>
         </div>
@@ -147,9 +151,9 @@ export default function MyEventsPage() {
 
           {/* Event Grid */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {myEvents.map((event) => (
+            {sortedEvents.map((event) => (
               <Card
-                key={event.id}
+                key={event._id}
                 className="group flex flex-col gap-0 overflow-hidden rounded-2xl border-line bg-card p-0 shadow-none transition hover:-translate-y-1 hover:shadow-lg hover:shadow-pri/5"
               >
                 {/* Image */}
@@ -206,24 +210,7 @@ export default function MyEventsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-auto flex gap-2 pt-6">
-                    <Link
-                      href={`/events/edit/${event.id}`}
-                      className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-line text-sm font-medium transition hover:bg-pri/10"
-                    >
-                      <Pencil className="size-4" />
-                      Edit
-                    </Link>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-10 flex-1 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="size-4" />
-                      Delete
-                    </Button>
-                  </div>
+                 <ManageActions event={event} />
                 </div>
               </Card>
             ))}

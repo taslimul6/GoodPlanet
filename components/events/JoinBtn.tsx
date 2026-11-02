@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Users, CheckCircle2 } from "lucide-react";
 import { authClient } from "@/src/app/lib/auth-client";
 
-const JoinBtn = ({ eventId }) => {
+const JoinBtn = ({ event }) => {
+
+  console.log("event in JoinBtn:", event._id);
 
   const [isJoined, setIsJoined] = useState(false);
   const { data: session } = authClient.useSession();
@@ -23,7 +25,7 @@ const JoinBtn = ({ eventId }) => {
             headers: {
               "Content-Type": "application/json",
               'query': JSON.stringify({
-                eventId: eventId,
+                eventId: event._id,
                 email: session?.user?.email,
               }),
 
@@ -37,7 +39,7 @@ const JoinBtn = ({ eventId }) => {
     };
 
     checkIfJoined();
-  }, [session, eventId]);
+  }, [session, event._id]);
 
   const handleJoin = async () => {
     // Logic to join the event (e.g., API call)
@@ -51,7 +53,8 @@ const JoinBtn = ({ eventId }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            eventId: eventId,
+            ...event,
+            eventId: event._id,
             email: session?.user?.email,
           }),
         },

@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
 import Footer from "@/components/shared/Footer";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "next-themes";
 
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -25,9 +27,12 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <NavBar />
-        {children}
-        <Footer />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <NavBar />
+          {children}
+          <Toaster />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
