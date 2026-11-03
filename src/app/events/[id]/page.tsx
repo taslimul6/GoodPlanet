@@ -15,6 +15,8 @@ import {
 
 import EventParticipants from "@/components/events/EventParticipants";
 
+import { getTokenFromServer } from "@/lib/getTokenFromServer";
+
 /* ----------------------------- Loading skeleton ---------------------------- */
 
 function EventDetailsSkeleton() {
@@ -47,10 +49,25 @@ function EventDetailsSkeleton() {
 async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
+
+    //jwt auth check
+ 
+
+
+
+    const token = await getTokenFromServer()
+
+
+
+
   // Get data from the database based on the event ID
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/event/${id}`,
-    { cache: "no-store" }
+    { cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+     }
   );
 
   if (!response.ok) {
@@ -62,6 +79,8 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   if (!event) {
     notFound();
   }
+
+
 
   return (
     <main className="min-h-screen bg-bg text-fg">

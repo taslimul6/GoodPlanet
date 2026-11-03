@@ -2,6 +2,7 @@
 
 import EventCard from "@/components/events/EventCard";
 import { Event } from "@/lib/event";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 import { useEffect, useMemo, useState } from "react";
 
 
@@ -29,7 +30,13 @@ export default function EventsPage() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API ?? "");
+
+        const token = await getTokenFromClient(); // get token from client side
+        const res = await fetch(process.env.NEXT_PUBLIC_MAIN_API ?? "", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
         if (!res.ok) throw new Error("Failed to fetch events");
 

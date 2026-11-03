@@ -15,32 +15,7 @@ export default function Stories() {
 
       <div id="st" className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Story 1 */}
-        <a
-          href="#"
-          className="hv im relative block aspect-[4/5] rounded-3xl overflow-hidden group"
-        >
-          <img
-            src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=700&h=875&q=85"
-            alt="Community food support"
-            loading="lazy"
-            className="absolute inset-0"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/25"></div>
-
-          <div className="absolute top-4 inset-x-4 flex justify-between text-xs font-bold text-white">
-            <span className="bg-white/20 backdrop-blur rounded-full px-3 py-1">
-              Food
-            </span>
-            <span className="bg-white/20 backdrop-blur rounded-full px-3 py-1">
-              Mumbai
-            </span>
-          </div>
-
-          <h3 className="absolute bottom-0 p-6 text-xl font-extrabold text-white leading-snug">
-            The kitchen that never closes
-          </h3>
-        </a>
+      
 
         {/* Story 2 */}
         <a
@@ -104,7 +79,7 @@ export default function Stories() {
           className="hv im relative block aspect-[4/5] rounded-3xl overflow-hidden group"
         >
           <img
-            src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba9?auto=format&fit=crop&w=700&h=875&q=85"
+            src="https://images.unsplash.com/photo-1758599668949-5118d71838fd?auto=format&fit=crop&w=700&h=875&q=85"
             alt="Beach clean-up"
             loading="lazy"
             className="absolute inset-0"

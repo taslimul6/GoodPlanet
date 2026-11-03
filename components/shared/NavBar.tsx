@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { authClient } from "@/src/app/lib/auth-client";
+import Link from "next/link";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -50,7 +51,7 @@ export default function NavBar() {
     <header className="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 text-xl font-extrabold">
+        <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
           <span className="grid size-9 place-items-center rounded-xl bg-pri text-on">
             <svg
               width="20"
@@ -67,7 +68,7 @@ export default function NavBar() {
             </svg>
           </span>
           GoodPlanet
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-8 text-sm font-semibold text-mut md:flex">

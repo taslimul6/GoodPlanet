@@ -17,6 +17,7 @@ import {
 
 import { auth } from "../../lib/auth";
 import { headers } from "next/headers";
+import { getTokenFromServer } from "@/lib/getTokenFromServer";
 
 export default function JoinedEventsPage() {
   return (
@@ -31,7 +32,7 @@ async function JoinedEventsContent() {
     headers: await headers(),
   });
 
-  console.log(session?.user?.email);
+  const token = await getTokenFromServer(); // get token from server side
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/bookedEvents`,
@@ -41,6 +42,7 @@ async function JoinedEventsContent() {
       headers: {
         "Content-Type": "application/json",
         query: session?.user?.email ?? "",
+        Authorization: `Bearer ${token}`,
       },
     }
   );

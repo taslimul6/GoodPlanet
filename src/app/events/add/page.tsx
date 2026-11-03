@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const categories = [
   "Environment",
@@ -44,41 +45,52 @@ const imageSuggestions = [
 
 export default function AddEventPage() {
   const [image, setImage] = useState("");
-  const [minDate, setMinDate] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
-  useEffect(() => {
-    const today = new Date();
-    setMinDate(
-      `${today.getFullYear()}-${String(
-        today.getMonth() + 1
-      ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
-    );
-  }, []);
-
-  const {data:session } = authClient.useSession() 
-
-    
+  const minDate =
+    typeof window === "undefined"
+      ? ""
+      : `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(
+          new Date().getDate()
+        ).padStart(2, "0")}`;
+      
+      
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    const fdata = Object.fromEntries(formData.entries());
 
-    const eventData = {...data, createdBy: session?.user?.name , email: session?.user?.email , participants: []};
+    const newErrors: Record<string, string> = {};
+    if (!fdata.title) newErrors.title = "Title is required";
+    if (!fdata.category) newErrors.category = "Category is required";
+    if (!fdata.description) newErrors.description = "Description is required";
+    if (!fdata.date) newErrors.date = "Date is required";
+    if (!fdata.location) newErrors.location = "Location is required";
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
+
+    const eventData = {...fdata, createdBy: session?.user?.name , email: session?.user?.email , participants: []};
 
     console.log("Submitting event data:", eventData);
 
     
 
- 
+ //jwt token for auth
 
+    const token = await getTokenFromClient(); // get token from client side
 
     const result = await fetch(process.env.NEXT_PUBLIC_MAIN_API + "/event", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(eventData),
     });
@@ -152,6 +164,7 @@ export default function AddEventPage() {
                       placeholder="e.g. Community Tree Planting Day"
                       className="h-12 rounded-xl border-line bg-bg"
                     />
+                    {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -179,6 +192,7 @@ export default function AddEventPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.category && <p className="text-xs text-red-500">{errors.category}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -203,8 +217,9 @@ export default function AddEventPage() {
                       required
                       rows={5}
                       placeholder="What is the event about? What will participants do?"
-                      className="min-h-32 resize-y rounded-xl border-line bg-bg"
-                    />
+                       className="min-h-32 resize-y rounded-xl border-line bg-bg"
+                     />
+                     {errors.description && <p className="text-xs text-red-500">{errors.description}</p>}
                   </div>
                 </div>
               </div>
@@ -233,9 +248,10 @@ export default function AddEventPage() {
                       name="date"
                       type="date"
                       min={minDate}
-                      required
-                      className="h-12 rounded-xl border-line bg-bg"
-                    />
+                       required
+                       className="h-12 rounded-xl border-line bg-bg"
+                     />
+                     {errors.date && <p className="text-xs text-red-500">{errors.date}</p>}
                   </div>
 
                   <div className="space-y-2 sm:col-span-2">
@@ -247,9 +263,10 @@ export default function AddEventPage() {
                       id="location"
                       name="location"
                       required
-                      placeholder="Venue name, street address, city"
-                      className="h-12 rounded-xl border-line bg-bg"
-                    />
+                       placeholder="Venue name, street address, city"
+                       className="h-12 rounded-xl border-line bg-bg"
+                     />
+                     {errors.location && <p className="text-xs text-red-500">{errors.location}</p>}
                   </div>
                 </div>
               </div>

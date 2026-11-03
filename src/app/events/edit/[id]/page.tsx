@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const categories = [
   "Environment",
@@ -79,18 +80,27 @@ export  function PageContent() {
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState("");
 
-  const today = new Date();
-  const minDate = `${today.getFullYear()}-${String(
-    today.getMonth() + 1
-  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const minDate =
+    typeof window === "undefined"
+      ? ""
+      : (() => {
+          const today = new Date();
+          return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(
+            today.getDate()
+          ).padStart(2, "0")}`;
+        })();
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MAIN_API}/event/${eventId}`,
-          { cache: "no-store" }
-        );
+      const fetchEvent = async () => {
+        try {
+          const token = await getTokenFromClient();
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_MAIN_API}/event/${eventId}`,
+            {
+              cache: "no-store",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
         if (!res.ok) throw new Error("Failed to load event");
         const data = await res.json();
         setEvent(data);
@@ -122,12 +132,16 @@ export  function PageContent() {
     };
 
     try {
+
+        const token = await getTokenFromClient(); 
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_MAIN_API}/event/${eventId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(eventData),
         }
@@ -350,7 +364,6 @@ export  function PageContent() {
                       type="url"
                       value={image}
                       onChange={(e) => setImage(e.target.value)}
-                      defaultValue={event.image || ""}
                       placeholder="https://example.com/event-image.jpg"
                       className="h-12 rounded-xl border-line bg-bg"
                     />

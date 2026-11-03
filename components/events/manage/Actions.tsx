@@ -6,16 +6,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Event } from "@/lib/event";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const ManageActions = ({ event }: { event: Event }) => {
   const router = useRouter();
 
   const handleEventDelete = async () => {
     try {
+      const token = await getTokenFromClient(); // get token from client side
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_MAIN_API}/event/${event._id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
 

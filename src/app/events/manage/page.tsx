@@ -16,6 +16,7 @@ import {
 import { auth } from "../../lib/auth";
 import { Suspense } from "react";
 import ManageActions from "@/components/events/manage/Actions";
+import { getTokenFromServer } from "@/lib/getTokenFromServer";
 
 
 
@@ -37,14 +38,15 @@ export async function MyEventsPageContent() {
     headers: await headers(),
   });
 
-  console.log(session?.user?.email);
+  const token = await getTokenFromServer(); // get token from server side
+
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/myEvents`,
     {
       method: "GET",
       cache: "no-store",
-      headers: { query: session?.user?.email ?? "" },
+      headers: { query: session?.user?.email ?? "", Authorization: `Bearer ${token}` },
     }
   );
 
