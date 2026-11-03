@@ -7,6 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 import { authClient } from "@/src/app/lib/auth-client";
 import { Event } from "@/lib/event";
 import { toast } from "sonner";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const JoinBtn = ({ event, onJoin }: { event: Event; onJoin?: () => void }) => {
 
@@ -19,16 +20,20 @@ const JoinBtn = ({ event, onJoin }: { event: Event; onJoin?: () => void }) => {
 
   useEffect(() => {
     const checkIfJoined = async () => {
+
+      const token = await getTokenFromClient(); // get token from client side
       if (session?.user?.email) {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_MAIN_API}/event/joined/check`,
           {
-            
+           
             headers: {
               "Content-Type": "application/json",
+              'Authorization': `Bearer ${token}`,
               'query': JSON.stringify({
                 eventId: event._id,
                 email: session?.user?.email,
+                
               }),
 
             },
@@ -45,18 +50,24 @@ const JoinBtn = ({ event, onJoin }: { event: Event; onJoin?: () => void }) => {
 
   const handleJoin = async () => {
     // Logic to join the event (e.g., API call)
+    const token = await getTokenFromClient();
 
     if (!isJoined) {
+
+      const {_id, email, ...eventData} = event;
+
+      console.log(`id ${_id} \\\ event:${eventData}`)
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_MAIN_API}/event/join`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            ...event,
-            eventId: event._id,
+            ...eventData,
+            eventId:_id,
             email: session?.user?.email,
           }),
         },

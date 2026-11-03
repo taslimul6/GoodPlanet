@@ -33,51 +33,68 @@ export default function MyEventsPage() {
 
 export async function MyEventsPageContent() {
 
+let myEvents: Event[] = [];
+let sortedEvents: Event[] = [];
 
+let upcomingEvents = 0;
+
+try {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const token = await getTokenFromServer(); // get token from server side
-
+  const token = await getTokenFromServer();
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/myEvents`,
     {
       method: "GET",
       cache: "no-store",
-      headers: { query: session?.user?.email ?? "", Authorization: `Bearer ${token}` },
+      headers: {
+        query: session?.user?.email ?? "",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
 
-  const myEvents: Event[] = await response.json();
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
 
-  const sortedEvents = myEvents
-    .slice()
-    .sort((a: Event, b: Event) => {
-      const aUpcoming = a.status === "Upcoming";
-      const bUpcoming = b.status === "Upcoming";
-      if (aUpcoming && !bUpcoming) return -1;
-      if (!aUpcoming && bUpcoming) return 1;
-      return String(a.date ?? "").localeCompare(String(b.date ?? ""));
-    });
+  const data = await response.json();
+
+  // Ensure API response is an array
+  myEvents = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.data)
+      ? data.data
+      : Array.isArray(data?.events)
+        ? data.events
+        : [];
+
+  // Sort events
+  sortedEvents = [...myEvents].sort((a, b) => {
+    const aUpcoming = a.status === "Upcoming";
+    const bUpcoming = b.status === "Upcoming";
+
+    if (aUpcoming && !bUpcoming) return -1;
+    if (!aUpcoming && bUpcoming) return 1;
+
+    return String(a.date ?? "").localeCompare(
+      String(b.date ?? "")
+    );
+  });
+
+ 
 
 
-
-  
-  
-  
-  //end api call
-
-  const totalParticipants = myEvents.reduce(
-    (total, event) =>
-      total + (typeof event.participants === "number" ? event.participants : 0),
-    0
-  );
-
-  const upcomingEvents = myEvents.filter(
+  // Upcoming events count
+  upcomingEvents = myEvents.filter(
     (event) => event.status === "Upcoming"
   ).length;
+} catch (error) {
+  console.error("Failed to fetch my events:", error);
+}
 
   return (
     <main className="min-h-screen bg-bg text-fg">

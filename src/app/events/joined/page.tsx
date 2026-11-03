@@ -28,37 +28,37 @@ export default function JoinedEventsPage() {
 }
 
 async function JoinedEventsContent() {
+let joinedEvents: Event[] = [];
+
+try {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const token = await getTokenFromServer(); // get token from server side
+  const token = await getTokenFromServer();
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_MAIN_API}/bookedEvents`,
     {
-      cache: "no-store",
       method: "GET",
+      cache: "no-store",
       headers: {
-        "Content-Type": "application/json",
         query: session?.user?.email ?? "",
         Authorization: `Bearer ${token}`,
       },
     }
   );
 
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+
   const data = await response.json();
-  console.log("response:", data);
 
-  const joinedEvents: Event[] = data || [];
-
-  const upcomingEvents = joinedEvents.filter(
-    (event) => event.status === "Upcoming"
-  ).length;
-
-  const completedEvents = joinedEvents.filter(
-    (event) => event.status === "Completed"
-  ).length;
+  joinedEvents = Array.isArray(data) ? data : [];
+} catch (error) {
+  console.error("Failed to fetch booked events:", error);
+}
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -104,7 +104,7 @@ async function JoinedEventsContent() {
             </p>
           </Card>
 
-          <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
+          {/* <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-mut">
                 Upcoming events
@@ -113,11 +113,11 @@ async function JoinedEventsContent() {
             </div>
 
             <p className="mt-3 text-3xl font-extrabold text-pri">
-              {upcomingEvents.toString().padStart(2, "0")}
+              3
             </p>
-          </Card>
+          </Card> */}
 
-          <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
+          {/* <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-mut">
                 Completed events
@@ -126,9 +126,9 @@ async function JoinedEventsContent() {
             </div>
 
             <p className="mt-3 text-3xl font-extrabold">
-              {completedEvents.toString().padStart(2, "0")}
+              2
             </p>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Joined Events */}
@@ -205,7 +205,7 @@ async function JoinedEventsContent() {
                   {/* Action */}
                   <div className="mt-auto pt-6">
                     <Link
-                      href={`/events/${event._id}`}
+                      href={`/events/${event.eventId}`}
                       className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-line text-sm font-semibold transition hover:border-pri hover:bg-pri/10 hover:text-pri"
                     >
                       View event details
