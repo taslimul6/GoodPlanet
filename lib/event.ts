@@ -12,4 +12,5 @@ export interface Event {
   participants?: string[] | number;
   createdBy?: string;
   email?: string;
+  eventId?:string;
 }
