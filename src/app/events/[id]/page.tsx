@@ -72,9 +72,6 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
     console.error("Failed to fetch event:", error);
   }
 
-  if (!response?.ok || !event) {
-    notFound();
-  }
 
   return (
     <main className="min-h-screen bg-bg text-fg">
