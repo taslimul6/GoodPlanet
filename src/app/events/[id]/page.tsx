@@ -49,38 +49,32 @@ function EventDetailsSkeleton() {
 async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-
-    //jwt auth check
- 
-
-
-
-    const token = await getTokenFromServer()
-
-
-
+  // jwt auth check
+  const token = await getTokenFromServer();
 
   // Get data from the database based on the event ID
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_MAIN_API}/event/${id}`,
-    { cache: "no-store",
+
+  let response;
+  let event;
+
+  try {
+    response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/event/${id}`, {
+      cache: "no-store",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-     }
-  );
+    });
 
-  if (!response.ok) {
-    notFound();
+    if (response.ok) {
+      event = await response.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
   }
 
-  const event = await response.json();
-
-  if (!event) {
+  if (!response?.ok || !event) {
     notFound();
   }
-
-
 
   return (
     <main className="min-h-screen bg-bg text-fg">
