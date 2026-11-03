@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +56,7 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
 
   let response;
   let event;
+  let eventCount: number = 0;
 
   try {
     response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/event/${id}`, {
@@ -68,6 +69,20 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
     if (response.ok) {
       event = await response.json();
     }
+
+    const eventRes = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/booked/${id}`, {
+       cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+
+    });
+
+    const bookedEvents = await eventRes.json();
+    eventCount = bookedEvents.length;
+    
+
+
   } catch (error) {
     console.error("Failed to fetch event:", error);
   }
@@ -157,7 +172,7 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
           <aside>
             <Card className="sticky top-8 gap-0 rounded-2xl border-line bg-card p-6 shadow-none">
               {/* Join Button Component */}
-              <EventParticipants event={event} />
+              <EventParticipants event={event} eventCount={eventCount} />
 
               {/* Divider */}
               <div className="my-6 border-t border-line" />

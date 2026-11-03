@@ -8,9 +8,9 @@ import { authClient } from "@/src/app/lib/auth-client";
 import JoinBtn from "./JoinBtn";
 import { Event } from "@/lib/event";
 
-const EventParticipants = ({ event }: { event: Event }) => {
+const EventParticipants = ({ event , eventCount }: { event: Event , eventCount: number }) => {
   const { data: session } = authClient.useSession();
-  const [participants, setParticipants] = useState(0);
+  const [participants, setParticipants] = useState(eventCount);
   const [joined, setJoined] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const EventParticipants = ({ event }: { event: Event }) => {
         const data = await res.json();
         if (data.joined) {
           setJoined(true);
-          setParticipants(1);
+          setParticipants(eventCount);
         }
       } catch (err) {
         console.error(err);
@@ -40,7 +40,7 @@ const EventParticipants = ({ event }: { event: Event }) => {
     };
 
     checkJoined();
-  }, [session, event._id]);
+  }, [session, event._id, eventCount]);
 
   return (
     <div className="mt-5 space-y-3 border-t border-line pt-4">
@@ -48,7 +48,7 @@ const EventParticipants = ({ event }: { event: Event }) => {
         <Users className="size-4 shrink-0 text-pri" />
         <span>{participants} participant</span>
       </div>
-      <JoinBtn event={event} onJoin={() => setParticipants(1)} />
+      <JoinBtn event={event} setParticipants={setParticipants} eventCount={eventCount} />
     </div>
   );
 };

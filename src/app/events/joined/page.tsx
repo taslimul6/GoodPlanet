@@ -9,10 +9,9 @@ import { Event } from "@/lib/event";
 import {
   CalendarDays,
   MapPin,
-  Users,
   ArrowRight,
   TicketCheck,
-  Clock,
+
 } from "lucide-react";
 
 import { auth } from "../../lib/auth";

@@ -73,25 +73,13 @@ try {
         : [];
 
   // Sort events
-  sortedEvents = [...myEvents].sort((a, b) => {
-    const aUpcoming = a.status === "Upcoming";
-    const bUpcoming = b.status === "Upcoming";
-
-    if (aUpcoming && !bUpcoming) return -1;
-    if (!aUpcoming && bUpcoming) return 1;
-
-    return String(a.date ?? "").localeCompare(
-      String(b.date ?? "")
-    );
-  });
-
+sortedEvents = [...myEvents].sort((a, b) =>
+  String(a.date ?? "").localeCompare(String(b.date ?? ""))
+);
  
 
 
-  // Upcoming events count
-  upcomingEvents = myEvents.filter(
-    (event) => event.status === "Upcoming"
-  ).length;
+  
 } catch (error) {
   console.error("Failed to fetch my events:", error);
 }
@@ -136,24 +124,9 @@ try {
             </p>
           </Card>
 
-          <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
-            <p className="text-sm font-medium text-mut">
-              Upcoming events
-            </p>
-            <p className="mt-2 text-3xl font-extrabold text-pri">
-              {upcomingEvents.toString().padStart(2, "0")}
-            </p>
-          </Card>
+          
 
-          <Card className="gap-0 rounded-2xl border-line bg-card p-5 shadow-none">
-            <p className="text-sm font-medium text-mut">
-              Total participants
-            </p>
-            <p className="mt-2 text-3xl font-extrabold">
-              {/* {totalParticipants} */}
-              122
-            </p>
-          </Card>
+          
         </div>
 
         {/* Events Section */}

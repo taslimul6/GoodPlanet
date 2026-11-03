@@ -9,9 +9,9 @@ import { Event } from "@/lib/event";
 import { toast } from "sonner";
 import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
-const JoinBtn = ({ event, onJoin }: { event: Event; onJoin?: () => void }) => {
+const JoinBtn = ({ event, setParticipants , eventCount}: { event: Event, eventCount:number, setParticipants:  React.Dispatch<React.SetStateAction<number>>}) => {
 
-  console.log("event in JoinBtn:", event._id);
+  
 
   const [isJoined, setIsJoined] = useState(false);
   const { data: session } = authClient.useSession();
@@ -75,7 +75,8 @@ const JoinBtn = ({ event, onJoin }: { event: Event; onJoin?: () => void }) => {
 
       if (res.ok) {
         setIsJoined(true);
-        onJoin?.();
+        // onJoin?.();
+        setParticipants(eventCount+1);
         toast.success("You have successfully joined this event!");
       } else {
         toast.error("Failed to join this event. Please try again.");
