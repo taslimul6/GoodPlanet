@@ -1,649 +1,268 @@
- 
-# 🌍 GoodPlanet
+<div align="center">
 
-### Make a Difference. Create a Better Planet.
+# 🌍 GoodPlanet — Client
 
-GoodPlanet is a community-driven event platform designed to connect people with meaningful social and environmental initiatives. Users can explore community events, participate in activities, and contribute to making the world a better place.
+**Make a difference. Create a better planet.**
 
-The platform brings volunteers, organizers, and communities together through a simple and accessible event management experience.
+A community event platform that connects volunteers, organizers and neighbours around social and environmental causes. Discover events, join them, track your volunteer hours and build a profile, or organize your own.
 
----
+[Links](#-links) · [Server repository](https://github.com/taslimul6/GoodPlanet-server) · [Report a bug](https://github.com/taslimul6/GoodPlanet/issues)
 
-## 📌 Table of Contents
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-149eca?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
+![Better Auth](https://img.shields.io/badge/Better_Auth-1.7-111)
+![MongoDB](https://img.shields.io/badge/MongoDB-47a248?logo=mongodb&logoColor=white)
 
-- [About the Project](#-about-the-project)
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [Project Architecture](#-project-architecture)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Backend API Documentation](#-backend-api-documentation)
-- [Database Structure](#-database-structure)
-- [Event Management Workflow](#-event-management-workflow)
-- [Authentication](#-authentication)
-- [Future Improvements](#-future-improvements)
-- [Contributing](#-contributing)
-- [License](#-license)
+<br />
+
+![GoodPlanet home page](docs/screenshots/homepage.png)
+
+</div>
 
 ---
 
-## 🌱 About the Project
+## 📑 Table of contents
 
-GoodPlanet aims to make community participation easier by providing a centralized platform where people can discover and join meaningful events.
-
-From food distribution and environmental campaigns to education and community support, GoodPlanet helps users find opportunities to make a positive impact.
-
-### Project Goals
-
-- Connect volunteers with community initiatives.
-- Make discovering local events easier.
-- Help organizers manage their events.
-- Encourage social responsibility and environmental awareness.
-- Build an accessible community participation platform.
-
----
-
-## ✨ Key Features
-
-### 1. Event Discovery
-
-- Browse available community events.
-- Explore events by category.
-- View event descriptions, dates, and locations.
-- Discover featured events.
-- View detailed event information.
-
-### 2. Event Participation
-
-- Join available events.
-- Prevent duplicate event registrations.
-- Check whether a user has already joined an event.
-- View previously joined events.
-- Track event participation statistics.
-
-### 3. Event Management
-
-- Create new events.
-- View managed events.
-- Edit existing event information.
-- Delete events.
-- Manage event details and capacity.
-
-### 4. User Authentication
-
-- User authentication through the configured authentication system.
-- Access the authenticated user's session.
-- Retrieve the user's email for event participation.
-- Associate event registrations with users.
-
-### 5. Dashboard
-
-- View total joined events.
-- Track upcoming events.
-- Track completed events.
-- Access event details.
-- Explore additional community initiatives.
+1. [Links](#-links)
+2. [About the project](#-about-the-project)
+3. [Features](#-features)
+4. [Tech stack](#-tech-stack)
+5. [Pages and routes](#-pages-and-routes)
+6. [API overview](#-api-overview)
+7. [Project structure](#-project-structure)
+8. [Getting started](#-getting-started)
+9. [Environment variables](#-environment-variables)
+10. [Security](#-security)
+11. [Scripts](#-scripts)
+12. [Roadmap](#-roadmap)
 
 ---
 
-## 🛠️ Technology Stack
+## 🔗 Links
 
-### Frontend
-
-| Technology | Purpose |
-|---|---|
-| Next.js | React framework |
-| React | User interface |
-| JavaScript | Application logic |
-| Tailwind CSS | Styling |
-| shadcn/ui | UI components |
-| Lucide React | Icons |
-| Sonner | Toast notifications |
-
-### Backend
-
-| Technology | Purpose |
-|---|---|
-| Node.js | JavaScript runtime |
-| Express.js | REST API |
-| MongoDB | Database |
-| MongoDB Node.js Driver | Database operations |
-| dotenv | Environment configuration |
-| CORS | Cross-origin resource sharing |
-
-### Authentication
-
-- Better Auth (configured authentication library)
-- Server-side session retrieval
+| | |
+| --- | --- |
+| **Live website** | _add the client URL after deployment_ |
+| **Live API** | _add the server URL after deployment_ |
+| **Client repository** | https://github.com/taslimul6/GoodPlanet |
+| **Server repository** | https://github.com/taslimul6/GoodPlanet-server |
 
 ---
 
-## 🏗️ Project Architecture
+## 🌱 About the project
 
-GoodPlanet follows a client-server architecture.
+GoodPlanet is built with the Next.js App Router. Every list, form and dashboard talks to a real Express + MongoDB API that is protected with JWTs.
 
-```text
-                 GOODPLANET
-                     |
-          +----------+----------+
-          |                     |
-       Frontend              Backend
-       Next.js               Express.js
-          |                     |
-     React Components       REST API Routes
-          |                     |
-     Server / Client       MongoDB Driver
-     Components                 |
-          |                     |
-          +----------+----------+
-                     |
-                  MongoDB
-                     |
-             goodPlanet Database
+| Who | What they can do |
+| --- | --- |
+| **Visitor** | Read the home page, see featured events, sign up or log in with email or Google. |
+| **Participant** | Browse, search and filter events, save them, join or cancel, wait for a spot on full events, follow organizers, collect volunteer hours, manage a profile. |
+| **Organizer** | Create, edit and delete events, set capacity and volunteer hours, see their events and stats on one dashboard. |
+
+---
+
+## ✨ Features
+
+### Events
+- **Browse and search** upcoming events with category filters and a live search box.
+- **Event page** with banner, status badge, description, organizer, location and a sidebar of actions.
+- **Create, edit and delete** your own events (delete asks for confirmation and also removes bookings, bookmarks and waitlist entries).
+- **Status badges:** Upcoming, Ongoing today, Ended, plus **Full** or **N spots left** when seats run low.
+
+### Joining
+- **Capacity limit** with a progress bar. Two people joining the last seat at the same moment is handled safely: only one gets in.
+- **Waitlist:** on a full event you can join the waitlist and see your position. A cancellation or a larger capacity moves people in automatically, oldest first.
+- **Cancel join** with a confirmation dialog.
+
+### Sharing and planning
+- **Save / bookmark** events (heart-style toggle on cards and the event page) and review them on `/events/saved`.
+- **Share** with copy link, WhatsApp, Facebook or the native share sheet.
+- **Add to calendar:** Google Calendar link or downloadable `.ics` file.
+- **Countdown timer** to the start of the event.
+
+### Profile
+- **Overview:** joined, upcoming, completed, created and saved counts.
+- **Volunteer hours:** hours are credited automatically once a joined event has ended, with a log of every event. Organizers can set the hours per event (default 4).
+- **Follow organizers** and manage the list from the Following tab.
+- **Settings:** edit name and bio, **upload a profile photo** (ImgBB), change password, delete account.
+
+### Dashboards
+- **My Events** and **Joined Events** share one set of components: stats, status badges, empty and error states and loading skeletons.
+
+### Auth and UI
+- **Better Auth** with email + password and Google sign in; route protection in `proxy.ts`.
+- Responsive layout, light / dark mode, toast notifications and loading skeletons.
+
+---
+
+## 🧰 Tech stack
+
+| Area | Tools |
+| --- | --- |
+| Framework | **Next.js 16** (App Router, Cache Components, `proxy.ts`), **React 19**, **TypeScript** |
+| Styling / UI | **Tailwind CSS 4**, **shadcn/ui** on **Base UI**, `lucide-react`, `tw-animate-css` |
+| Auth | **Better Auth** (email, Google OAuth, JWT plugin) + `@better-auth/mongo-adapter` |
+| Data | **MongoDB**, Express API for business data ([server repo](https://github.com/taslimul6/GoodPlanet-server)) |
+| Images | **ImgBB** API (uploaded from the server, the key never reaches the browser) |
+| UX | `sonner` toasts, `next-themes`, `embla-carousel-react`, `recharts`, `date-fns` |
+
+---
+
+## 🗺️ Pages and routes
+
+| Type | Routes |
+| --- | --- |
+| Public | `/` Home, `/login`, `/signup` |
+| Logged-in only | `/events` List, `/events/[id]` Details, `/events/add`, `/events/edit/[id]`, `/events/manage`, `/events/joined`, `/events/saved`, `/profile` |
+
+Next.js route handlers: `/api/auth/[...all]` (Better Auth) and `/api/upload/avatar` (photo upload).
+
+---
+
+## 🔌 API overview
+
+The client talks to the [GoodPlanet server](https://github.com/taslimul6/GoodPlanet-server) with `Authorization: Bearer <JWT>`. Endpoints marked 🔒 need a valid token.
+
+| Area | Endpoints |
+| --- | --- |
+| Events | `GET /` · `GET /featured` · 🔒 `GET /event/:id` · 🔒 `POST /event` · 🔒 `PUT /event/:id` · 🔒 `DELETE /event/:id` · 🔒 `GET /myEvents` |
+| Joining | 🔒 `POST /event/join` · 🔒 `DELETE /event/join/:eventId` · 🔒 `GET /booked/:id` · 🔒 `GET /bookedEvents` |
+| Capacity | 🔒 `GET /event/capacity/:id` · 🔒 `POST /event/waitlist` · 🔒 `DELETE /event/waitlist/:eventId` |
+| Saved | 🔒 `GET /saved` · 🔒 `GET /saved/ids` · 🔒 `POST /saved` · 🔒 `DELETE /saved/:eventId` |
+| Profile | 🔒 `GET /profile/stats` |
+| Follow | 🔒 `GET /following` · 🔒 `GET /follow/status/:organizer` · 🔒 `POST /follow` · 🔒 `DELETE /follow/:organizer` |
+
+**Event document**
+
+```json
+{
+  "title": "Cox's Bazar Beach Cleanup Drive",
+  "category": "Environment",
+  "organizer": "Clean Coast Bangladesh",
+  "description": "…",
+  "date": "2026-12-12",
+  "location": "Cox's Bazar",
+  "image": "https://…",
+  "capacity": "250",
+  "hours": "4",
+  "email": "creator@example.com",
+  "createdBy": "Creator name"
+}
 ```
 
-### Application Flow
-
-1. Users interact with the Next.js frontend.
-2. The frontend sends HTTP requests to the Express backend.
-3. Express processes requests and communicates with MongoDB.
-4. MongoDB returns the requested data.
-5. The backend sends JSON responses.
-6. The frontend displays the results.
+MongoDB collections: `events`, `bookedEvents`, `savedEvents`, `follows`, `waitlist` (business data) and the Better Auth collections (`user`, `session`, `account`, `verification`, `jwks`).
 
 ---
 
-## 📁 Project Structure
+## 📁 Project structure
 
-The following is a suggested structure based on the current application architecture. Adjust filenames to match your actual repository.
-
-### Frontend
-
-```text
-frontend/
-├── app/
-│   ├── events/
-│   │   ├── page.jsx
-│   │   ├── [id]/
-│   │   ├── edit/
-│   │   └── manage/
-│   ├── dashboard/
-│   └── layout.jsx
-│
+```
+good-planet/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Home page
+│   │   ├── layout.tsx            # Root layout (navbar, footer, theme, toasts)
+│   │   ├── events/               # list, [id], add, edit/[id], manage, joined, saved
+│   │   ├── profile/              # Profile page with tabs
+│   │   ├── login/ signup/
+│   │   ├── api/                  # auth/[...all], upload/avatar
+│   │   └── lib/                  # auth.ts (server), auth-client.ts (browser)
+│   └── proxy.ts                  # Route protection
 ├── components/
-│   ├── ui/
-│   ├── events/
-│   └── ManageActions.jsx
-│
-├── lib/
-│   └── auth.js
-│
-├── public/
-├── .env.local
-└── package.json
-```
-
-### Backend
-
-```text
-backend/
-├── server.js
-├── .env
-└── package.json
+│   ├── events/                   # EventCard, SaveBtn, ShareBtn, JoinBtn, StatusBadge, …
+│   ├── profile/                  # Header and the Overview / Following / Settings tabs
+│   ├── homePage/ shared/ ui/     # Home sections, navbar and footer, shadcn/ui
+├── lib/                          # event types, date helpers, token helpers, server fetch
+├── docs/                         # Feature plan, commit plan, screenshots
+└── public/
 ```
 
 ---
 
-## 🚀 Getting Started
-
-Follow these instructions to run GoodPlanet locally.
+## 🚀 Getting started
 
 ### Prerequisites
+- **Node.js 20+** and npm
+- A **MongoDB** database (Atlas works)
+- The **[GoodPlanet server](https://github.com/taslimul6/GoodPlanet-server)** running (default `http://localhost:5000`)
+- Accounts for **Google OAuth** and **ImgBB**
 
-Make sure you have installed:
-
-- Node.js (LTS recommended)
-- npm
-- MongoDB database
-- Git
-
-### 1. Clone the Repository
+### Installation
 
 ```bash
-git clone YOUR_REPOSITORY_URL
-```
-
-```bash
-cd YOUR_PROJECT_FOLDER
-```
-
-### 2. Install Frontend Dependencies
-
-Navigate to the frontend directory:
-
-```bash
-cd frontend
+git clone https://github.com/taslimul6/GoodPlanet.git
+cd GoodPlanet
 npm install
+cp .env.example .env     # then fill in the values (see below)
 ```
 
-### 3. Install Backend Dependencies
-
-Navigate to the backend directory:
+### Run locally
 
 ```bash
-cd backend
-npm install
-```
+# 1. start the API first (in the server folder)
+node index.js            # http://localhost:5000
 
-### 4. Configure Environment Variables
-
-Create the required environment files for both applications.
-
-Frontend:
-
-```env
-NEXT_PUBLIC_MAIN_API=http://localhost:5000
-```
-
-Backend:
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-```
-
-Add any additional authentication environment variables required by your Better Auth configuration.
-
-### 5. Start the Backend
-
-```bash
-npm run dev
-```
-
-The backend will run at:
-
-```text
-http://localhost:5000
-```
-
-### 6. Start the Frontend
-
-From the frontend directory:
-
-```bash
-npm run dev
-```
-
-The frontend will be available at:
-
-```text
-http://localhost:3000
+# 2. start the client
+npm run dev              # http://localhost:3000
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 🔐 Environment variables
 
-### Frontend Environment
+Create `.env` from `.env.example`. **Never commit `.env`.**
 
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_MAIN_API` | Express backend API base URL |
+| Variable | Required | Description |
+| --- | --- | --- |
+| `BETTER_AUTH_SECRET` | ✅ | Secret that signs sessions |
+| `BETTER_AUTH_URL` | ✅ | Public URL of the client (also the JWT issuer) |
+| `NEXT_PUBLIC_BETTER_AUTH_URL` | ➖ | Same URL for the browser (recommended on Vercel) |
+| `MONGODB_URI` | ✅ | MongoDB connection string |
+| `GOOGLE_CLIENT_ID` | ✅ | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | ✅ | Google OAuth client secret |
+| `NEXT_PUBLIC_MAIN_API` | ✅ | Base URL of the Express API, e.g. `http://localhost:5000` |
+| `FEATURED_API` | ✅ | `{API}/featured`, used by the home page |
+| `IMGBB_API_KEY` | ✅ | ImgBB key for profile photo uploads |
 
-### Backend Environment
+The server needs `MONGODB_URI` and `CLIENT_URL` (the client's public URL, used to fetch the JWKS that verifies tokens).
 
-| Variable | Description |
-|---|---|
-| `MONGODB_URI` | MongoDB connection string |
-
-**Important:** Never expose your MongoDB connection string or other private credentials in frontend environment variables.
-
----
-
-## 🔌 Backend API Documentation
-
-Base URL:
-
-```text
-http://localhost:5000
-```
-
-The backend provides REST API endpoints for event discovery, event management, and participation.
-
-### 1. Get All Events
-
-```http
-GET /
-```
-
-Returns all available events.
-
-### 2. Get Featured Events
-
-```http
-GET /featured
-```
-
-Returns up to six events.
-
-### 3. Get Event Details
-
-```http
-GET /event/:id
-```
-
-Example:
-
-```http
-GET /event/672abc123456789012345678
-```
-
-Returns a specific event using its MongoDB ObjectId.
-
-### 4. Create an Event
-
-```http
-POST /event
-```
-
-Request body:
-
-```json
-{
-  "title": "Community Food Drive",
-  "category": "Food & Hunger",
-  "organizer": "GoodPlanet Team",
-  "description": "Help distribute food to families in need.",
-  "date": "2026-11-03",
-  "location": "Dhaka, Bangladesh",
-  "image": "https://example.com/event-image.jpg",
-  "capacity": "50",
-  "createdBy": "IT Sheba",
-  "email": "admin@example.com"
-}
-```
-
-### 5. Update an Event
-
-```http
-PUT /event/:id
-```
-
-Updates an existing event using its MongoDB ObjectId.
-
-Request body:
-
-```json
-{
-  "title": "Updated Community Food Drive",
-  "category": "Food & Hunger",
-  "organizer": "GoodPlanet Team",
-  "description": "Updated event description.",
-  "date": "2026-11-05",
-  "location": "Dhaka, Bangladesh",
-  "image": "https://example.com/updated-image.jpg",
-  "capacity": "60",
-  "createdBy": "IT Sheba",
-  "email": "admin@example.com"
-}
-```
-
-### 6. Delete an Event
-
-```http
-DELETE /event/:id
-```
-
-Deletes an event using its MongoDB ObjectId.
-
-### 7. Check Event Participation
-
-```http
-GET /event/joined/check
-```
-
-Request header:
-
-```json
-{
-  "query": "{\"eventId\":\"EVENT_ID\",\"email\":\"user@example.com\"}"
-}
-```
-
-Returns:
-
-```json
-{
-  "joined": true
-}
-```
-
-Or:
-
-```json
-{
-  "joined": false
-}
-```
-
-### 8. Join an Event
-
-```http
-POST /event/join
-```
-
-Request body:
-
-```json
-{
-  "eventId": "EVENT_ID",
-  "email": "user@example.com"
-}
-```
-
-Successful response:
-
-```json
-{
-  "message": "Successfully joined the event."
-}
-```
-
-If the user has already joined:
-
-```json
-{
-  "message": "You have already joined this event."
-}
-```
-
-### 9. Get Joined Events
-
-```http
-GET /event/bookedEvents
-```
-
-Request header:
-
-```text
-query: user@example.com
-```
-
-Returns the list of event registrations associated with the provided email.
+Google OAuth redirect URI: `{BETTER_AUTH_URL}/api/auth/callback/google`
 
 ---
 
-## 🗄️ Database Structure
+## 🛡️ Security
 
-Database name:
-
-```text
-goodPlanet
-```
-
-### Events Collection
-
-Collection name:
-
-```text
-events
-```
-
-Example document:
-
-```json
-{
-  "_id": "MongoDB ObjectId",
-  "title": "Community Food Drive",
-  "category": "Food & Hunger",
-  "organizer": "GoodPlanet Team",
-  "description": "Help distribute food to families in need.",
-  "date": "2026-11-03",
-  "location": "Dhaka, Bangladesh",
-  "image": "https://example.com/image.jpg",
-  "capacity": "50",
-  "createdBy": "IT Sheba",
-  "email": "admin@example.com"
-}
-```
-
-### Booked Events Collection
-
-Collection name:
-
-```text
-bookedEvents
-```
-
-Example document:
-
-```json
-{
-  "_id": "MongoDB ObjectId",
-  "eventId": "EVENT_OBJECT_ID",
-  "email": "user@example.com"
-}
-```
-
-The `bookedEvents` collection stores user participation records.
-
-Each record connects a user with an event through `eventId` and `email`.
+- All secrets come from environment variables and `.env*` files are gitignored.
+- Better Auth signs a short-lived JWT; the server verifies it against the client's JWKS. Newer endpoints read the user's email from the verified token, not from the request.
+- Photo uploads go through a server route that checks the session, the file type (JPG, PNG, WEBP, GIF) and the size (5 MB) before sending to ImgBB.
+- Deleting an account requires the password (or a fresh sign in for Google accounts) plus a typed confirmation, and removes the user's data.
 
 ---
 
-## 🔄 Event Management Workflow
+## 📜 Scripts
 
-### Creating an Event
-
-1. An authorized user opens the event creation interface.
-2. The user provides event information.
-3. The frontend sends a POST request.
-4. Express receives the event data.
-5. MongoDB inserts the event into the `events` collection.
-
-### Joining an Event
-
-1. A user opens an event details page.
-2. The frontend checks whether the user has already joined.
-3. If not registered, the user can join the event.
-4. The backend checks for an existing booking.
-5. If no booking exists, a new record is inserted into `bookedEvents`.
-
-### Updating an Event
-
-1. The organizer opens the edit page.
-2. Existing event information is displayed.
-3. The organizer modifies the required fields.
-4. The frontend sends a PUT request.
-5. Express updates the MongoDB document.
-6. The frontend displays a success notification.
-
-### Deleting an Event
-
-1. The organizer clicks the Delete button.
-2. The frontend sends a DELETE request.
-3. Express removes the event from MongoDB.
-4. The frontend refreshes the page and displays a toast notification.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+| `npx tsc --noEmit` | Type check |
 
 ---
 
-## 🔑 Authentication
+## 🚧 Roadmap
 
-GoodPlanet uses Better Auth for authentication.
-
-The application retrieves the current user's session on the server using the configured authentication API.
-
-Example:
-
-```javascript
-const session = await auth.api.getSession({
-  headers: await headers()
-});
-```
-
-The authenticated user's email is used to associate event participation records with the correct user.
+Ideas planned in [docs/plans/features.md](docs/plans/features.md): map and directions, image gallery, event duplicate, recurring events, comments and reviews, email and in-app notifications, admin panel and role system, certificates, multi-language and PWA support.
 
 ---
 
-## 🚧 Future Improvements
+<div align="center">
 
-Potential improvements for future development:
+Released under the MIT License · Made with 🌱 by **Taslimul Hasan**
 
-- [ ] Role-based access control for organizers and administrators.
-- [ ] Event capacity enforcement.
-- [ ] Event registration cancellation.
-- [ ] Automatic upcoming/completed event status calculation.
-- [ ] Search and advanced event filtering.
-- [ ] Pagination for event listings.
-- [ ] Event image upload integration.
-- [ ] Email notifications for event registration.
-- [ ] Event attendance tracking.
-- [ ] Improved API validation and error handling.
-- [ ] MongoDB indexes for faster queries.
-- [ ] Automated testing for backend endpoints.
+*Small actions can create a big impact.*
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-If you would like to improve GoodPlanet:
-
-1. Fork the repository.
-2. Create a new feature branch.
-
-```bash
-git checkout -b feature/your-feature-name
-```
-
-3. Make your changes.
-4. Commit your changes.
-
-```bash
-git commit -m "Add: your feature description"
-```
-
-5. Push your branch.
-
-```bash
-git push origin feature/your-feature-name
-```
-
-6. Open a Pull Request.
-
----
-
-## 📄 License
-
-This project is available under the MIT License unless otherwise specified in the repository.
-
----
-
-## 🌍 Our Mission
-
-**Small actions can create a big impact.**
-
-GoodPlanet is built around the idea that everyone can contribute to a better world. By connecting people with meaningful community initiatives, we aim to make positive change easier, more accessible, and more collaborative.
-
-Let's build a better planet together. 🌱
+</div>
