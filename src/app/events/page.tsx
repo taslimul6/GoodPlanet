@@ -4,6 +4,7 @@ import EventCard from "@/components/events/EventCard";
 import { Event } from "@/lib/event";
 import { getTokenFromClient } from "@/lib/getTokenFromClient";
 import { useEffect, useMemo, useState } from "react";
+import { authClient } from "@/src/app/lib/auth-client";
 
 
 export default function EventsPage() {
@@ -13,6 +14,26 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [todayString, setTodayString] = useState("");
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const { data: session } = authClient.useSession();
+  const email = session?.user?.email;
+
+  // Fetch the user's saved event ids once (instead of one request per card)
+  useEffect(() => {
+    if (!email) return;
+
+    (async () => {
+      try {
+        const token = await getTokenFromClient();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_MAIN_API}/saved/ids`, {
+          headers: { Authorization: `Bearer ${token}`, query: email },
+        });
+        if (res.ok) setSavedIds(new Set(await res.json()));
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [email]);
 
   useEffect(() => {
     const today = new Date();
@@ -206,7 +227,19 @@ export default function EventsPage() {
         ) : filteredEvents.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-5">
             {filteredEvents.map((event) => (
-              <EventCard key={event._id} event={event} />
+              <EventCard
+                key={event._id}
+                event={event}
+                saved={savedIds.has(event._id ?? "")}
+                onSavedChange={(isSaved) =>
+                  setSavedIds((prev) => {
+                    const next = new Set(prev);
+                    if (isSaved) next.add(event._id ?? "");
+                    else next.delete(event._id ?? "");
+                    return next;
+                  })
+                }
+              />
             ))}
           </div>
         ) : (
