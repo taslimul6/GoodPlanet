@@ -1,6 +1,15 @@
 import { Event } from "@/lib/event";
+import SaveBtn from "./SaveBtn";
 
-export default function EventCard({ event }: { event: Event }) {
+export default function EventCard({
+  event,
+  saved,
+  onSavedChange,
+}: {
+  event: Event;
+  saved?: boolean;
+  onSavedChange?: (saved: boolean) => void;
+}) {
   const formatDate = (date: string | number | undefined) => {
     if (!date) return "Date not specified";
 
@@ -31,6 +40,12 @@ export default function EventCard({ event }: { event: Event }) {
             {event.category}
           </span>
         )}
+
+        <SaveBtn
+          eventId={event._id}
+          initialSaved={saved}
+          onChange={onSavedChange}
+        />
       </div>
 
       <div className="flex flex-col flex-1 p-5">
