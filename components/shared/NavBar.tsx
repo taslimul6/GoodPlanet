@@ -8,6 +8,7 @@ import {
   CalendarPlus,
   CalendarDays,
   CalendarCheck,
+  Bookmark,
   LogOut,
   UserRound,
 } from "lucide-react";
@@ -170,6 +171,14 @@ export default function NavBar() {
                   >
                     <CalendarCheck className="size-4 text-mut" />
                     Joined events
+                  </a>
+
+                  <a
+                    href="/events/saved"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-line"
+                  >
+                    <Bookmark className="size-4 text-mut" />
+                    Saved events
                   </a>
                 </div>
 
