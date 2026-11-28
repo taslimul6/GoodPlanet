@@ -9,11 +9,14 @@ import {
   CalendarDays,
   MapPin,
   ArrowLeft,
-  Share2,
   UserRound,
 } from "lucide-react";
 
 import EventParticipants from "@/components/events/EventParticipants";
+import SaveBtn from "@/components/events/SaveBtn";
+import ShareBtn from "@/components/events/ShareBtn";
+import AddToCalendar from "@/components/events/AddToCalendar";
+import Countdown from "@/components/events/Countdown";
 
 import { getTokenFromServer } from "@/lib/getTokenFromServer";
 
@@ -171,6 +174,9 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
           {/* Right Sidebar */}
           <aside>
             <Card className="sticky top-8 gap-0 rounded-2xl border-line bg-card p-6 shadow-none">
+              {/* Countdown */}
+              <Countdown date={event.date} />
+
               {/* Join Button Component */}
               <EventParticipants event={event} eventCount={eventCount} />
 
@@ -216,14 +222,14 @@ async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
 
+              {/* Save */}
+              <SaveBtn eventId={event._id} variant="button" />
+
+              {/* Add to calendar */}
+              <AddToCalendar event={event} />
+
               {/* Share */}
-              <button
-                type="button"
-                className="mt-7 flex h-10 w-full items-center justify-center rounded-full border border-line text-sm font-medium transition hover:bg-muted"
-              >
-                <Share2 className="mr-2 size-4" />
-                Share event
-              </button>
+              <ShareBtn title={event.title} />
             </Card>
           </aside>
         </div>
